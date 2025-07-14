@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Phoenix</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg1: #18191a;
+    --bg2: #232526;
+    --outline: #ff9100;
+    --outline-hover: #ffb347;
+    --text: #f5f5f7;
+    --accent: #ff9100;
+    --font-main: 'Inter', Arial, sans-serif;
+    --font-title: 'Orbitron', 'Inter', Arial, sans-serif;
+    --nav-width: 70px;
+    --nav-width-expanded: 210px;
+    --nav-label-delay: 0.2s;
+  }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(120deg, var(--bg1), var(--bg2), #1a1a1a 70%);
+    background-size: 200% 200%;
+    animation: bgmove 15s ease-in-out infinite alternate;
+    color: var(--text);
+    font-family: var(--font-main);
+    overflow-x: hidden;
+  }
+  @keyframes bgmove {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+  }
+  .side-nav {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: var(--nav-width);
+    background: rgba(20,20,22,0.98);
+    border-right: 2px solid var(--outline);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 100;
+    box-shadow: 2px 0 24px #0002;
+    padding-top: 32px;
+    transition: width 0.25s cubic-bezier(.4,1.3,.6,1), border-color 0.2s;
+    overflow-x: visible;
+  }
+  .side-nav:focus-within,
+  .side-nav:hover {
+    width: var(--nav-width-expanded);
+  }
+  .nav-icon {
+    width: 38px; height: 38px;
+    margin: 18px 0 18px 16px;
+    display: flex; align-items: center;
+    border-radius: 12px;
+    transition: background 0.2s, box-shadow 0.2s, border-color 0.2s;
+    cursor: pointer;
+    border: 2px solid transparent;
+    position: relative;
+    outline: none;
+  }
+  .nav-icon.active, .nav-icon:focus, .nav-icon:hover {
+    background: rgba(255,145,0,0.12);
+    box-shadow: 0 2px 16px #ff910022;
+    border-color: var(--outline);
+  }
+  .nav-icon svg {
+    stroke: var(--outline);
+    width: 26px; height: 26px;
+    fill: none;
+    stroke-width: 2.3;
+    flex-shrink: 0;
+    transition: stroke 0.2s;
+  }
+  .nav-icon.active svg, .nav-icon:hover svg, .nav-icon:focus svg {
+    stroke: var(--outline-hover);
+  }
+  .nav-label {
+    opacity: 0;
+    max-width: 0;
+    margin-left: 18px;
+    color: var(--accent);
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    pointer-events: none;
+    transition: opacity 0.23s, max-width 0.23s, margin-left 0.23s;
+    transition-delay: 0s;
+    user-select: none;
+  }
+  .side-nav:hover .nav-label,
+  .side-nav:focus-within .nav-label {
+    opacity: 1;
+    max-width: 120px;
+    margin-left: 18px;
+    pointer-events: auto;
+    transition-delay: var(--nav-label-delay);
+  }
+  /* Main Content */
+  .main-content {
+    margin-left: var(--nav-width);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 7vw;
+    text-align: center;
+    transition: margin-left 0.25s cubic-bezier(.4,1.3,.6,1);
+  }
+  .side-nav:hover ~ .main-content,
+  .side-nav:focus-within ~ .main-content {
+    margin-left: var(--nav-width-expanded);
+  }
+  .phoenix-title {
+    font-family: var(--font-title);
+    font-size: 5rem;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    text-shadow: 0 2px 24px #ff910033;
+    font-weight: 700;
+    user-select: none;
+    margin-bottom: 12px;
+    margin-top: 90px;
+  }
+  .changing-text {
+    font-family: var(--font-main);
+    font-size: 1.7rem;
+    color: var(--outline);
+    letter-spacing: 0.06em;
+    height: 2.2rem;
+    overflow: hidden;
+    position: relative;
+    user-select: none;
+  }
+  .changing-text span {
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    animation: fadeScroll 12s linear infinite;
+  }
+  .changing-text span:nth-child(1) { animation-delay: 0s; }
+  .changing-text span:nth-child(2) { animation-delay: 4s; }
+  .changing-text span:nth-child(3) { animation-delay: 8s; }
+  @keyframes fadeScroll {
+    0% { opacity: 0; transform: translateY(30%); }
+    10% { opacity: 1; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(0); }
+    40% { opacity: 0; transform: translateY(-30%); }
+    100% { opacity: 0; transform: translateY(-30%); }
+  }
+  /* Quick Settings FAB */
+  .quick-settings-btn {
+    position: fixed;
+    bottom: 36px; right: 36px;
+    background: var(--bg2);
+    border: 2.5px solid var(--outline);
+    outline: none;
+    cursor: pointer;
+    z-index: 200;
+    border-radius: 50%;
+    width: 58px; height: 58px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 24px #0008;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .quick-settings-btn svg {
+    width: 34px; height: 34px;
+    stroke: var(--outline);
+    fill: none;
+    stroke-width: 2.7;
+    transition: stroke 0.2s;
+  }
+  .quick-settings-btn:hover, .quick-settings-btn:focus {
+    border-color: var(--outline-hover);
+    box-shadow: 0 2px 24px #ff910044;
+  }
+  .quick-settings-btn:hover svg {
+    stroke: var(--outline-hover);
+  }
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 300;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(24, 25, 26, 0.92);
+    align-items: center;
+    justify-content: center;
+  }
+  .modal.active { display: flex; }
+  .modal-content {
+    background: #222324;
+    border: 2.5px solid var(--outline);
+    border-radius: 18px;
+    padding: 32px 40px;
+    color: var(--text);
+    min-width: 320px;
+    max-width: 90vw;
+    box-shadow: 0 8px 40px #000a;
+    position: relative;
+    font-family: var(--font-main);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .close-modal {
+    position: absolute;
+    top: 10px; right: 18px;
+    font-size: 2rem;
+    color: var(--accent);
+    cursor: pointer;
+    background: none;
+    border: none;
+    line-height: 1;
+  }
+  .color-picker {
+    display: flex; gap: 10px; margin-top: 8px;
+  }
+  .color-dot {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 2px solid var(--outline);
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .color-dot.selected, .color-dot:hover { border-color: var(--accent); }
+  /* Cloak Bar */
+  .cloak-bar {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: #232526;
+    color: #fff;
+    padding: 8px 24px;
+    font-size: 1rem;
+    z-index: 1000;
+    border-bottom: 2px solid var(--outline);
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.2s;
+  }
+  .cloak-bar.active { display: flex; }
+  .cloak-bar button {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-left: 12px;
+  }
+  @media (max-width: 600px) {
+    .main-content { margin-left: var(--nav-width); padding: 0 2vw; }
+    .phoenix-title { font-size: 3.2rem; }
+    .modal-content { padding: 16px 8px; min-width: 0; }
+    .side-nav { width: var(--nav-width); }
+    .side-nav:hover, .side-nav:focus-within { width: var(--nav-width-expanded); }
+  }
+</style>
+</head>
+<body>
+  <nav class="side-nav" aria-label="Primary">
+    <div class="nav-icon active" title="Home" tabindex="0" role="button" aria-pressed="true" onclick="setActiveNav(this)" onkeydown="if(event.key==='Enter'){setActiveNav(this);}">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12L12 4l9 8"/><path d="M5 12v7a1 1 0 001 1h3v-5h4v5h3a1 1 0 001-1v-7"/></svg>
+      <span class="nav-label">Home</span>
+    </div>
+    <div class="nav-icon" title="Games" tabindex="0" role="button" aria-pressed="false" onclick="setActiveNav(this)" onkeydown="if(event.key==='Enter'){setActiveNav(this);}">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>
+      <span class="nav-label">Games</span>
+    </div>
+    <div class="nav-icon" title="Apps" tabindex="0" role="button" aria-pressed="false" onclick="setActiveNav(this)" onkeydown="if(event.key==='Enter'){setActiveNav(this);}">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+      <span class="nav-label">Apps</span>
+    </div>
+    <div class="nav-icon" title="Proxies" tabindex="0" role="button" aria-pressed="false" onclick="setActiveNav(this)" onkeydown="if(event.key==='Enter'){setActiveNav(this);}">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 16h8M8 12h8M8 8h8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="nav-label">Proxies</span>
+    </div>
+    <div class="nav-icon" title="AI" tabindex="0" role="button" aria-pressed="false" onclick="setActiveNav(this)" onkeydown="if(event.key==='Enter'){setActiveNav(this);}">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M10 8h4v8h-4z"/></svg>
+      <span class="nav-label">AI</span>
+    </div>
+    <div class="nav-icon" title="Chat" tabindex="0" role="button" aria-pressed="false" onclick="setActiveNav(this)" onkeydown="if(event.key==='Enter'){setActiveNav(this);}">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="4"/><path d="M7 20h10"/></svg>
+      <span class="nav-label">Chat</span>
+    </div>
+    <div class="nav-icon" title="Contact" tabindex="0" role="button" aria-pressed="false" onclick="setActiveNav(this)" onkeydown="if(event.key==='Enter'){setActiveNav(this);}">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8l10 6 10-6"/></svg>
+      <span class="nav-label">Contact</span>
+    </div>
+    <div class="nav-icon" title="Settings" tabindex="0" role="button" aria-pressed="false" onclick="setActiveNav(this)" onkeydown="if(event.key==='Enter'){setActiveNav(this);}">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      <span class="nav-label">Settings</span>
+    </div>
+  </nav>
+
+  <!-- Cloak Bar -->
+  <div class="cloak-bar" id="cloakBar">
+    <span id="cloakLabel">Cloaked as: Google Classroom</span>
+    <button id="uncloakBtn" aria-label="Uncloak">Uncloak</button>
+  </div>
+
+  <main class="main-content" role="main" aria-label="Homepage">
+    <h1 class="phoenix-title">PHOENIX</h1>
+    <div class="changing-text" aria-live="polite" aria-atomic="true">
+      <span>Innovate.</span>
+      <span>Empower.</span>
+      <span>Transform.</span>
+    </div>
+  </main>
+
+  <!-- Quick Settings FAB -->
+  <button class="quick-settings-btn" id="settingsBtn" title="Quick Settings" aria-label="Open Quick Settings">
+    <svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+      <circle cx="20" cy="20" r="12" stroke="var(--outline)" stroke-width="2.5" fill="none" />
+      <g>
+        <rect x="19" y="6" width="2" height="6" rx="1" fill="var(--outline)" />
+        <rect x="19" y="28" width="2" height="6" rx="1" fill="var(--outline)" />
+        <rect x="6" y="19" width="6" height="2" rx="1" fill="var(--outline)" />
+        <rect x="28" y="19" width="6" height="2" rx="1" fill="var(--outline)" />
+      </g>
+    </svg>
+  </button>
+
+  <!-- Quick Settings Modal -->
+  <div class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" tabindex="-1">
+    <div class="modal-content">
+      <button class="close-modal" id="closeModalBtn" aria-label="Close Quick Settings">&times;</button>
+      <h3 id="settingsTitle" style="color:var(--accent);font-family:var(--font-title);margin:0 0 8px 0;">Quick Settings</h3>
+      <div>
+        <label for="cloakSelect">Cloak Tab As:</label>
+        <select id="cloakSelect">
+          <option value="classroom">Google Classroom</option>
+          <option value="docs">Google Docs</option>
+          <option value="drive">Google Drive</option>
+          <option value="youtube">YouTube</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+      <div>
+        <label>Outline Color:</label>
+        <div class="color-picker">
+          <div class="color-dot selected" style="background:#ff9100;" data-color="#ff9100"></div>
+          <div class="color-dot" style="background:#ff3e3e;" data-color="#ff3e3e"></div>
+          <div class="color-dot" style="background:#29d398;" data-color="#29d398"></div>
+          <div class="color-dot" style="background:#42a5f5;" data-color="#42a5f5"></div>
+          <div class="color-dot" style="background:#ffd600;" data-color="#ffd600"></div>
+        </div>
+      </div>
+      <div style="font-size:0.98em;color:#ff9100b0;">
+        Press <b>Esc</b> to instantly cloak the tab.<br />
+        Click the cloak bar to uncloak.
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Side nav active state
+  function setActiveNav(el) {
+    document.querySelectorAll('.nav-icon').forEach(i => {
+      i.classList.remove('active');
+      i.setAttribute('aria-pressed', 'false');
+    });
+    el.classList.add('active');
+    el.setAttribute('aria-pressed', 'true');
+  }
+
+  // Modal logic
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsModal = document.getElementById('settingsModal');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  settingsBtn.onclick = () => {
+    settingsModal.classList.add('active');
+    settingsModal.focus();
+  };
+  closeModalBtn.onclick = () => settingsModal.classList.remove('active');
+  window.onclick = e => {
+    if (e.target === settingsModal) settingsModal.classList.remove('active');
+  };
+
+  // Outline Color Picker
+  const colorDots = document.querySelectorAll('.color-dot');
+  colorDots.forEach(dot => {
+    dot.onclick = () => {
+      document.documentElement.style.setProperty('--outline', dot.dataset.color);
+      document.documentElement.style.setProperty('--accent', dot.dataset.color);
+      colorDots.forEach(c => c.classList.remove('selected'));
+      dot.classList.add('selected');
+    };
+  });
+
+  // Cloaking Logic
+  const cloakBar = document.getElementById('cloakBar');
+  const cloakLabel = document.getElementById('cloakLabel');
+  const cloakSelect = document.getElementById('cloakSelect');
+  const uncloakBtn = document.getElementById('uncloakBtn');
+  function applyCloak(type) {
+    if (type === 'none') {
+      cloakBar.classList.remove('active');
+      document.title = 'Phoenix';
+      setFavicon('default');
+      return;
+    }
+    cloakBar.classList.add('active');
+    let label = '', title = '', favicon = '';
+    switch(type) {
+      case 'classroom':
+        label = 'Google Classroom';
+        title = 'Classes';
+        favicon = 'https://ssl.gstatic.com/classroom/ic_product_classroom_32.png';
+        break;
+      case 'docs':
+        label = 'Google Docs';
+        title = 'Untitled document - Google Docs';
+        favicon = 'https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico';
+        break;
+      case 'drive':
+        label = 'Google Drive';
+        title = 'My Drive - Google Drive';
+        favicon = 'https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png';
+        break;
+      case 'youtube':
+        label = 'YouTube';
+        title = 'YouTube';
+        favicon = 'https://www.youtube.com/s/desktop/6e6e5d1b/img/favicon_32x32.png';
+        break;
+    }
+    cloakLabel.textContent = `Cloaked as: ${label}`;
+    document.title = title;
+    setFavicon(favicon);
+  }
+  cloakSelect.onchange = e => applyCloak(e.target.value);
+  uncloakBtn.onclick = () => {
+    cloakSelect.value = 'none';
+    applyCloak('none');
+  };
+  function setFavicon(url) {
+    document.querySelectorAll('link[rel="icon"]').forEach(e => e.remove());
+    if (url === 'default') return;
+    const link = document.createElement('link');
+    link.rel = 'icon';
+    link.href = url;
+    document.head.appendChild(link);
+  }
+  // Panic Key (Esc)
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      cloakSelect.value = 'classroom';
+      applyCloak('classroom');
+      settingsModal.classList.remove('active');
+    }
+  });
+  // Click-off to Uncloak
+  cloakBar.onclick = () => {
+    cloakSelect.value = 'none';
+    applyCloak('none');
+  };
+</script>
+</body>
+</html>

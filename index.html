@@ -454,9 +454,17 @@
       <span>Transform.</span>
     </div>
     <!-- Down arrow -->
+<!-- Down arrow always visible -->
 <button id="scrollDownBtn" aria-label="Scroll down to sections" style="margin: 40px auto 0; background:none; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color: var(--accent); font-size: 3rem; user-select:none;">
   &#x25BC;
 </button>
+
+<!-- Hidden-on-load content -->
+<div id="homeReveal" style="opacity:0; pointer-events:none; transition:opacity 0.7s cubic-bezier(.4,1.4,.6,1);">
+  <!-- Tab cards grid and diagnostics go here -->
+  <!-- ...(copy everything for the sections and diagnostics panel you were given, inside this div)... -->
+</div>
+
 
 <!-- Sections container -->
 <section id="tabSections" style="margin-top: 80px; width: 100%; max-width: 1000px; display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 24px;">
@@ -874,6 +882,32 @@ function renderDiagnostics(diagnostics) {
   html += '</ul>';
   output.innerHTML = html;
 }
+  const revealDiv = document.getElementById('homeReveal');
+const arrowBtn = document.getElementById('scrollDownBtn');
+let revealed = false;
+
+function doReveal() {
+  if (!revealed) {
+    revealDiv.style.opacity = '1';
+    revealDiv.style.pointerEvents = 'auto';
+    setTimeout(() => {
+      const tabSections = document.getElementById('tabSections');
+      if(tabSections) tabSections.scrollIntoView({behavior:"smooth"});
+    }, 80);
+    revealed = true;
+  }
+}
+
+arrowBtn.addEventListener('click', doReveal);
+
+window.addEventListener('scroll', function() {
+  if (!revealed && window.scrollY > window.innerHeight/3) {
+    doReveal();
+  }
+});
+
+// (Keep your other tab-card and diagnostics scripts just as before)
+
 
 </script>
 </body>

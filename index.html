@@ -452,61 +452,8 @@
     </div>
     <!-- Down arrow -->
 <!-- Down arrow always visible -->
-  <div id="homePageContent">  
-<button id="scrollDownBtn" aria-label="Scroll down to sections" style="margin: 40px auto 0; background:none; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color: var(--accent); font-size: 3rem; user-select:none;">
-  &#x25BC;
-</button>
+ 
 
-<!-- Hidden-on-load content -->
-<div id="homeReveal" style="opacity:0; pointer-events:none; transition:opacity 0.7s cubic-bezier(.4,1.4,.6,1);">
-  <!-- Tab cards grid and diagnostics go here -->
-  <!-- ...(copy everything for the sections and diagnostics panel you were given, inside this div)... -->
-</div>
-
-
-<!-- Sections container -->
-<section id="tabSections" style="margin-top: 80px; width: 100%; max-width: 1000px; display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 24px;">
-  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="games" onclick="setActiveNavByTab('games')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('games');}">
-    <h3>Games</h3>
-    <p>Play your favorite games directly in the vault.</p>
-  </article>
-  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="proxies" onclick="setActiveNavByTab('proxies')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('proxies');}">
-    <h3>Proxies</h3>
-    <p>Access proxy servers for secure browsing.</p>
-  </article>
-  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="apps" onclick="setActiveNavByTab('apps')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('apps');}">
-    <h3>Apps</h3>
-    <p>Useful apps and utilities at your fingertips.</p>
-  </article>
-  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="ai" onclick="setActiveNavByTab('ai')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('ai');}">
-    <h3>AI</h3>
-    <p>Explore AI tools and chatbots.</p>
-  </article>
-  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="chat" onclick="setActiveNavByTab('chat')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('chat');}">
-    <h3>Chat</h3>
-    <p>Connect and communicate instantly.</p>
-  </article>
-  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="contact" onclick="setActiveNavByTab('contact')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('contact');}">
-    <h3>Contact</h3>
-    <p>Get in touch with the team.</p>
-  </article>
-  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="settings" onclick="setActiveNavByTab('settings')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('settings');}">
-    <h3>Settings</h3>
-    <p>Customize your experience.</p>
-  </article>
-</section>
-
-<!-- Diagnostics panel -->
-<section id="diagnostics" style="margin-top: 80px; max-width: 600px; width: 100%; background: rgba(35,37,38,0.85); border: 2px solid var(--outline); border-radius: 16px; padding: 24px; box-shadow: 0 0 24px #ff910033;">
-  <h2 style="color: var(--accent); font-family: var(--font-title); margin-bottom: 16px;">Diagnostics</h2>
-  <button id="runDiagnosticsBtn" style="background: var(--outline); border: none; padding: 12px 24px; border-radius: 12px; font-weight: 700; color: #121212; cursor: pointer; user-select: none; transition: background 0.3s;">
-    Run Diagnostics
-  </button>
-  <div id="diagnosticsOutput" style="margin-top: 24px; font-family: var(--font-main); font-size: 1rem; color: var(--text); min-height: 160px;">
-    <!-- Statuses and loading bar will appear here -->
-  </div>
-</section>
-    </div>
 
 
     <!-- Games tab content -->
@@ -573,6 +520,60 @@
       </div>
     </div>
   </div>
+  <button id="scrollDownBtn" aria-label="Scroll down to sections" style="margin: 40px auto 0; background:none; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color: var(--accent); font-size: 3rem; user-select:none;">
+  &#x25BC;
+</button>
+
+<!-- Hidden-on-load content -->
+<div id="homeReveal" style="opacity:0; pointer-events:none; transition:opacity 0.7s cubic-bezier(.4,1.4,.6,1);">
+  <!-- Tab cards grid and diagnostics go here -->
+  <!-- ...(copy everything for the sections and diagnostics panel you were given, inside this div)... -->
+</div>
+
+
+<!-- Sections container -->
+<section id="tabSections" style="margin-top: 80px; width: 100%; max-width: 1000px; display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 24px;">
+  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="games" onclick="setActiveNavByTab('games')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('games');}">
+    <h3>Games</h3>
+    <p>Play your favorite games directly in the vault.</p>
+  </article>
+  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="proxies" onclick="setActiveNavByTab('proxies')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('proxies');}">
+    <h3>Proxies</h3>
+    <p>Access proxy servers for secure browsing.</p>
+  </article>
+  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="apps" onclick="setActiveNavByTab('apps')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('apps');}">
+    <h3>Apps</h3>
+    <p>Useful apps and utilities at your fingertips.</p>
+  </article>
+  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="ai" onclick="setActiveNavByTab('ai')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('ai');}">
+    <h3>AI</h3>
+    <p>Explore AI tools and chatbots.</p>
+  </article>
+  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="chat" onclick="setActiveNavByTab('chat')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('chat');}">
+    <h3>Chat</h3>
+    <p>Connect and communicate instantly.</p>
+  </article>
+  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="contact" onclick="setActiveNavByTab('contact')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('contact');}">
+    <h3>Contact</h3>
+    <p>Get in touch with the team.</p>
+  </article>
+  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="settings" onclick="setActiveNavByTab('settings')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('settings');}">
+    <h3>Settings</h3>
+    <p>Customize your experience.</p>
+  </article>
+</section>
+
+<!-- Diagnostics panel -->
+<section id="diagnostics" style="margin-top: 80px; max-width: 600px; width: 100%; background: rgba(35,37,38,0.85); border: 2px solid var(--outline); border-radius: 16px; padding: 24px; box-shadow: 0 0 24px #ff910033;">
+  <h2 style="color: var(--accent); font-family: var(--font-title); margin-bottom: 16px;">Diagnostics</h2>
+  <button id="runDiagnosticsBtn" style="background: var(--outline); border: none; padding: 12px 24px; border-radius: 12px; font-weight: 700; color: #121212; cursor: pointer; user-select: none; transition: background 0.3s;">
+    Run Diagnostics
+  </button>
+  <div id="diagnosticsOutput" style="margin-top: 24px; font-family: var(--font-main); font-size: 1rem; color: var(--text); min-height: 160px;">
+    <!-- Statuses and loading bar will appear here -->
+  </div>
+</section>
+   
 
 <script>
   // Your games list — replace URLs with your actual game URLs and download links

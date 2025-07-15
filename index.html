@@ -151,6 +151,50 @@
     40% { opacity: 0; transform: translateY(-30%); }
     100% { opacity: 0; transform: translateY(-30%); }
   }
+  .tab-card {
+  background: var(--bg2);
+  border: 2px solid var(--outline);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 0 16px #ff910033;
+  color: var(--accent);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+}
+.tab-card:hover, .tab-card:focus {
+  background: var(--outline);
+  box-shadow: 0 0 24px var(--outline-hover);
+  outline: none;
+  transform: translateY(-4px);
+}
+.tab-card h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 1.6rem;
+}
+.tab-card p {
+  margin: 0;
+  font-weight: 500;
+  color: var(--text);
+}
+#loadingBarContainer {
+  width: 100%;
+  background: #444;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 18px;
+  margin-top: 12px;
+}
+#loadingBar {
+  height: 100%;
+  width: 0%;
+  background: var(--outline);
+  transition: width 0.3s;
+}
+
   /* Games content */
   #gamesContent {
     width: 100%;
@@ -409,6 +453,54 @@
       <span>Empower.</span>
       <span>Transform.</span>
     </div>
+    <!-- Down arrow -->
+<button id="scrollDownBtn" aria-label="Scroll down to sections" style="margin: 40px auto 0; background:none; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color: var(--accent); font-size: 3rem; user-select:none;">
+  &#x25BC;
+</button>
+
+<!-- Sections container -->
+<section id="tabSections" style="margin-top: 80px; width: 100%; max-width: 1000px; display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 24px;">
+  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="games" onclick="setActiveNavByTab('games')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('games');}">
+    <h3>Games</h3>
+    <p>Play your favorite games directly in the vault.</p>
+  </article>
+  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="proxies" onclick="setActiveNavByTab('proxies')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('proxies');}">
+    <h3>Proxies</h3>
+    <p>Access proxy servers for secure browsing.</p>
+  </article>
+  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="apps" onclick="setActiveNavByTab('apps')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('apps');}">
+    <h3>Apps</h3>
+    <p>Useful apps and utilities at your fingertips.</p>
+  </article>
+  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="ai" onclick="setActiveNavByTab('ai')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('ai');}">
+    <h3>AI</h3>
+    <p>Explore AI tools and chatbots.</p>
+  </article>
+  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="chat" onclick="setActiveNavByTab('chat')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('chat');}">
+    <h3>Chat</h3>
+    <p>Connect and communicate instantly.</p>
+  </article>
+  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="contact" onclick="setActiveNavByTab('contact')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('contact');}">
+    <h3>Contact</h3>
+    <p>Get in touch with the team.</p>
+  </article>
+  <article class="tab-card" tabindex="0" role="button" aria-pressed="false" data-tab="settings" onclick="setActiveNavByTab('settings')" onkeydown="if(event.key==='Enter'){setActiveNavByTab('settings');}">
+    <h3>Settings</h3>
+    <p>Customize your experience.</p>
+  </article>
+</section>
+
+<!-- Diagnostics panel -->
+<section id="diagnostics" style="margin-top: 80px; max-width: 600px; width: 100%; background: rgba(35,37,38,0.85); border: 2px solid var(--outline); border-radius: 16px; padding: 24px; box-shadow: 0 0 24px #ff910033;">
+  <h2 style="color: var(--accent); font-family: var(--font-title); margin-bottom: 16px;">Diagnostics</h2>
+  <button id="runDiagnosticsBtn" style="background: var(--outline); border: none; padding: 12px 24px; border-radius: 12px; font-weight: 700; color: #121212; cursor: pointer; user-select: none; transition: background 0.3s;">
+    Run Diagnostics
+  </button>
+  <div id="diagnosticsOutput" style="margin-top: 24px; font-family: var(--font-main); font-size: 1rem; color: var(--text); min-height: 160px;">
+    <!-- Statuses and loading bar will appear here -->
+  </div>
+</section>
+
 
     <!-- Games tab content -->
     <div id="gamesContent">
@@ -705,6 +797,84 @@
     cloakSelect.value = 'none';
     applyCloak('none');
   };
+  // Scroll down button scrolls to tab sections
+document.getElementById('scrollDownBtn').addEventListener('click', () => {
+  document.getElementById('tabSections').scrollIntoView({ behavior: 'smooth' });
+});
+
+// Helper to activate nav by tab name (used by cards)
+function setActiveNavByTab(tabName) {
+  const navIcons = document.querySelectorAll('.nav-icon');
+  navIcons.forEach(icon => {
+    if (icon.dataset.tab === tabName) {
+      icon.click();
+    }
+  });
+}
+
+// Diagnostics logic
+const runBtn = document.getElementById('runDiagnosticsBtn');
+const output = document.getElementById('diagnosticsOutput');
+
+runBtn.addEventListener('click', () => {
+  runBtn.disabled = true;
+  output.innerHTML = `
+    <div>Running Diagnostics...</div>
+    <div id="loadingBarContainer"><div id="loadingBar"></div></div>
+  `;
+  const loadingBar = document.getElementById('loadingBar');
+
+  // Simulate loading progress
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += 5;
+    loadingBar.style.width = progress + '%';
+    if (progress >= 100) {
+      clearInterval(interval);
+      showDiagnosticsResults();
+      runBtn.disabled = false;
+    }
+  }, 100);
+});
+
+function showDiagnosticsResults() {
+  // Simulated diagnostic data
+  const diagnostics = {
+    "Server Status": "Online",
+    "Deployment Status": "Stable",
+    "Connection Status": "Good",
+    "Battery Status": navigator.getBattery ? "Checking..." : "Unavailable",
+    "WiFi Status": navigator.connection ? navigator.connection.effectiveType : "Unknown",
+    "Block Status": "Not Blocked",
+    "Games": "Accessible",
+    "Proxies": "Accessible",
+    "Apps": "Accessible",
+    "AI": "Accessible",
+    "Chat": "Accessible",
+    "Contact": "Accessible",
+    "Settings": "Accessible"
+  };
+
+  // For Battery Status, if supported, update asynchronously
+  if (navigator.getBattery) {
+    navigator.getBattery().then(battery => {
+      diagnostics["Battery Status"] = `${Math.round(battery.level * 100)}% ${battery.charging ? "(Charging)" : ""}`;
+      renderDiagnostics(diagnostics);
+    });
+  } else {
+    renderDiagnostics(diagnostics);
+  }
+}
+
+function renderDiagnostics(diagnostics) {
+  let html = '<ul style="list-style:none; padding-left:0;">';
+  for (const [key, value] of Object.entries(diagnostics)) {
+    html += `<li><strong>${key}:</strong> ${value}</li>`;
+  }
+  html += '</ul>';
+  output.innerHTML = html;
+}
+
 </script>
 </body>
 </html>

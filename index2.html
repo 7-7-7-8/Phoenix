@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phoenix</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    
+    <style>
+      :root {
+        --background: #0f0f0f;
+        --text: #f1f1f1;
+        --accent: #ff9100;
+        --outline: #ff9100;
+        --outline-hover: #ffa726;
+        --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        margin: 0;
+        background: var(--background);
+        font-family: var(--font-main);
+        color: var(--text);
+      }
+
+      .navbar {
+        width: 60px;
+        height: 100vh;
+        background: #1b1b1b;
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 20px;
+        z-index: 100;
+      }
+
+      .nav-icon {
+        width: 40px;
+        height: 40px;
+        margin: 10px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border-radius: 8px;
+        font-size: 1.4rem;
+      }
+
+      .nav-icon.active,
+      .nav-icon:hover {
+        background: var(--outline);
+        color: black;
+      }
+
+      .main-content {
+        margin-left: 80px;
+        padding: 30px;
+      }
+
+      .phoenix-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        color: var(--accent);
+      }
+
+      .changing-text {
+        font-size: 1.5rem;
+        color: var(--outline);
+        position: relative;
+        height: 2.2rem;
+        overflow: hidden;
+        user-select: none;
+      }
+
+      .changing-text span {
+        position: absolute;
+        width: 100%;
+        opacity: 0;
+        animation: fadeScroll 12s linear infinite;
+      }
+
+      .changing-text span:nth-child(1) { animation-delay: 0s; }
+      .changing-text span:nth-child(2) { animation-delay: 4s; }
+      .changing-text span:nth-child(3) { animation-delay: 8s; }
+
+      @keyframes fadeScroll {
+        0%   { opacity: 0; transform: translateY(30%); }
+        10%  { opacity: 1; transform: translateY(0); }
+        30%  { opacity: 1; transform: translateY(0); }
+        40%  { opacity: 0; transform: translateY(-30%); }
+        100% { opacity: 0; transform: translateY(-30%); }
+      }
+
+      #gameButtons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      #gameButtons button {
+        padding: 10px 14px;
+        font-weight: bold;
+        background: var(--outline);
+        color: black;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      #gameModal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #000000ef;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 200;
+      }
+
+      #gameModal.active {
+        display: flex;
+      }
+
+      #gameIframe {
+        width: 80vw;
+        height: 60vh;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0px 0px 8px var(--accent);
+      }
+
+      .modal-controls {
+        display: flex;
+        gap: 12px;
+        margin-top: 10px;
+      }
+
+      .modal-controls button {
+        background: var(--outline);
+        border: none;
+        padding: 10px 15px;
+        color: black;
+        font-weight: bold;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 12px;
+        right: 20px;
+        font-size: 2rem;
+        border: none;
+        background: none;
+        color: var(--accent);
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar Navigation -->
+    <div class="navbar">
+      <div class="nav-icon active" data-tab="home" onclick="setActiveNav(this)" aria-pressed="true" title="Home">🏠</div>
+      <div class="nav-icon" data-tab="games" onclick="setActiveNav(this)" aria-pressed="false" title="Games">🎮</div>
+      <div class="nav-icon" data-tab="apps" onclick="setActiveNav(this)" aria-pressed="false" title="Apps">💾</div>
+      <div class="nav-icon" data-tab="proxies" onclick="setActiveNav(this)" aria-pressed="false" title="Proxies">🕸️</div>
+      <div class="nav-icon" data-tab="ai" onclick="setActiveNav(this)" aria-pressed="false" title="AI">🤖</div>
+      <div class="nav-icon" data-tab="chat" onclick="setActiveNav(this)" aria-pressed="false" title="Chat">💬</div>
+      <div class="nav-icon" data-tab="contact" onclick="setActiveNav(this)" aria-pressed="false" title="Contact">📬</div>
+      <div class="nav-icon" data-tab="settings" onclick="setActiveNav(this)" aria-pressed="false" title="Settings" id="settingsBtn">⚙️</div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <h1 class="phoenix-title" id="pageTitle">PHOENIX</h1>
+      <div class="changing-text" aria-live="polite" aria-atomic="true">
+        <span>Innovate.</span>
+        <span>Empower.</span>
+        <span>Transform.</span>
+      </div>
+      <!-- Down Arrow -->
+      <button id="scrollDownBtn" style="margin:2rem 0;display:block;background:none;border:none;cursor:pointer;">
+        <span style="font-size:2.2rem;color:var(--outline);">▼</span>
+      </button>
+      <!-- Home-Only Content -->
+      <div id="homePageContent" class="home-center">
+        <!-- Link/tab cards grid -- will be populated by JS if needed -->
+        <div id="tabSections">
+          <!-- Example tab cards (edit contents as you like) -->
+          <div style="display:flex;flex-wrap:wrap;gap:2rem;justify-content:center;">
+            <div class="tab-card" onclick="setActiveNavByTab('games')" style="background:#212121;padding:1.5rem 2rem;border-radius:16px;box-shadow:0 0 6px #0001;cursor:pointer;min-width:180px;text-align:center;">
+              <div style="font-size:2.4rem;">🎮</div>
+              <div style="margin-top:.6rem;font-weight:bold;color:var(--outline);">Games</div>
+            </div>
+            <div class="tab-card" onclick="setActiveNavByTab('proxies')" style="background:#212121;padding:1.5rem 2rem;border-radius:16px;box-shadow:0 0 6px #0001;cursor:pointer;min-width:180px;text-align:center;">
+              <div style="font-size:2.4rem;">🕸️</div>
+              <div style="margin-top:.6rem;font-weight:bold;color:var(--outline);">Proxies</div>
+            </div>
+            <div class="tab-card" onclick="setActiveNavByTab('apps')" style="background:#212121;padding:1.5rem 2rem;border-radius:16px;box-shadow:0 0 6px #0001;cursor:pointer;min-width:180px;text-align:center;">
+              <div style="font-size:2.4rem;">💾</div>
+              <div style="margin-top:.6rem;font-weight:bold;color:var(--outline);">Apps</div>
+            </div>
+            <div class="tab-card" onclick="setActiveNavByTab('ai')" style="background:#212121;padding:1.5rem 2rem;border-radius:16px;box-shadow:0 0 6px #0001;cursor:pointer;min-width:180px;text-align:center;">
+              <div style="font-size:2.4rem;">🤖</div>
+              <div style="margin-top:.6rem;font-weight:bold;color:var(--outline);">AI</div>
+            </div>
+          </div>
+        </div>
+        <!-- Diagnostics Panel -->
+        <section style="margin-top:2.5rem;width:95%;max-width:700px;">
+          <div style="background:#191919;border-radius:14px;padding:1rem 1.2rem;box-shadow:0 2px 12px #0002;">
+            <h3 style="margin-top:0;color:var(--accent);font-size:1.13rem;letter-spacing:.04em;">Diagnostics</h3>
+            <div style="margin-bottom:1rem;">
+              <button id="runDiagnosticsBtn" style="background:var(--outline);color:black;font-weight:bold;border:none;padding:7px 15px;border-radius:7px;cursor:pointer;">Run Diagnostics</button>
+            </div>
+            <div id="diagnosticsOutput"></div>
+          </div>
+        </section>
+      </div>
+            <!-- Games Content (hidden unless games tab active) -->
+      <div id="gamesContent" style="display:none;">
+        <h2 style="color:var(--accent);margin-top:0;">Games</h2>
+        <div class="game-buttons" id="gameButtons"></div>
+      </div>
+
+      <!-- Apps Content -->
+      <div id="appsContent" style="display:none;">
+        <h2 style="color:var(--accent);margin-top:0;">Apps</h2>
+        <!-- Add your apps UI/content here -->
+      </div>
+
+      <!-- Proxies Content -->
+      <div id="proxiesContent" style="display:none;">
+        <h2 style="color:var(--accent);margin-top:0;">Proxies</h2>
+        <!-- Add your proxy tools/list here -->
+      </div>
+
+      <!-- AI Content -->
+      <div id="aiContent" style="display:none;">
+        <h2 style="color:var(--accent);margin-top:0;">AI</h2>
+        <!-- Add your AI tools/chatbot here -->
+      </div>
+
+      <!-- Chat Content -->
+      <div id="chatContent" style="display:none;">
+        <h2 style="color:var(--accent);margin-top:0;">Chat</h2>
+        <!-- Add your chat or communication UIs here -->
+      </div>
+
+      <!-- Contact Content -->
+      <div id="contactContent" style="display:none;">
+        <h2 style="color:var(--accent);margin-top:0;">Contact</h2>
+        <!-- Add your contact or feedback form here -->
+      </div>
+
+      <!-- Settings Modal -->
+      <div id="settingsModal" tabindex="-1" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:210;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;">
+        <div style="background:#181818;padding:2rem 2.7rem;border-radius:18px;max-width:95vw;min-width:320px;position:relative;">
+          <button id="closeModalBtn" style="position:absolute;top:10px;right:18px;background:none;border:none;color:var(--outline);font-size:2rem;cursor:pointer;">&times;</button>
+          <h2 style="color:var(--accent);margin-top:0;">Quick Settings</h2>
+          <div style="margin:1.2rem 0 2rem 0;">
+            <div style="margin-bottom:.9rem; font-weight:bold;">Outline/Accent Color:</div>
+            <div>
+              <span class="color-dot" data-color="#ff9100" style="background:#ff9100;"></span>
+              <span class="color-dot" data-color="#00ffd0" style="background:#00ffd0;"></span>
+              <span class="color-dot" data-color="#82b1ff" style="background:#82b1ff;"></span>
+              <span class="color-dot" data-color="#e040fb" style="background:#e040fb;"></span>
+              <span class="color-dot" data-color="#ffee00" style="background:#ffee00;"></span>
+            </div>
+          </div>
+          <div style="margin-bottom:1rem;">
+            <div style="font-weight:bold; margin-bottom:0.3rem;">Cloak Page as:</div>
+            <select id="cloakSelect" style="padding:7px 16px;border-radius:6px;">
+              <option value="none">None</option>
+              <option value="classroom">Google Classroom</option>
+              <option value="docs">Google Docs</option>
+              <option value="drive">Google Drive</option>
+              <option value="youtube">YouTube</option>
+            </select>
+            <button id="uncloakBtn" style="margin-left:12px;background:var(--accent);color:black;font-weight:bold;border:none;padding:6px 13px;border-radius:5px;cursor:pointer;">Uncloak</button>
+          </div>
+        </div>
+      </div>
+      <div id="cloakBar" style="background:#333;color:white;padding:6px 10px;position:fixed;bottom:12px;right:20px;border-radius:8px;z-index:300;display:none;align-items:center;gap:10px;cursor:pointer;">
+        <span id="cloakLabel"></span>
+      </div>
+
+      <!-- Game Modal (Pops up on game launch) -->
+      <div id="gameModal">
+        <button class="close-btn" id="closeGameModal" aria-label="Close Game Modal">&times;</button>
+        <iframe id="gameIframe" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+        <div class="modal-controls">
+          <button id="fullscreenBtn" type="button">Fullscreen</button>
+          <button id="aboutBlankBtn" type="button">Open in about:blank</button>
+          <button id="downloadBtn" type="button">Download</button>
+        </div>
+      </div>
+    </main>
+        <script>
+      // ✅ Declare currentGame globally to avoid errors
+      let currentGame = null;
+
+      const games = [
+        { name: "Bob The Robber 4", url: "https://7-7-7-8.github.io/BobTheRobber4/", download: "https://7-7-7-8.github.io/BobTheRobber4/" },
+        { name: "2048 Fusion", url: "https://ucbg.github.io/2048-fusion/", download: "https://ucbg.github.io/2048-fusion/" },
+        // Add more games if needed
+      ];
+
+      const gameButtonsContainer = document.getElementById('gameButtons');
+      const gamesContent = document.getElementById('gamesContent');
+      const gameModal = document.getElementById('gameModal');
+      const gameIframe = document.getElementById('gameIframe');
+      const closeGameModal = document.getElementById('closeGameModal');
+      const fullscreenBtn = document.getElementById('fullscreenBtn');
+      const aboutBlankBtn = document.getElementById('aboutBlankBtn');
+      const downloadBtn = document.getElementById('downloadBtn');
+
+      // Populate game buttons
+      function populateGameButtons() {
+        gameButtonsContainer.innerHTML = '';
+        games.forEach(game => {
+          const btn = document.createElement('button');
+          btn.textContent = game.name;
+          btn.onclick = () => openGameModal(game);
+          gameButtonsContainer.appendChild(btn);
+        });
+      }
+
+      // Open game modal
+      function openGameModal(game) {
+        currentGame = game;
+        gameIframe.src = game.url;
+        gameModal.classList.add('active');
+
+        fullscreenBtn.onclick = () => {
+          if (gameIframe.requestFullscreen) {
+            gameIframe.requestFullscreen();
+          } else if (gameIframe.webkitRequestFullscreen) {
+            gameIframe.webkitRequestFullscreen(); // Safari
+          } else if (gameIframe.msRequestFullscreen) {
+            gameIframe.msRequestFullscreen(); // IE11
+          } else {
+            alert("Fullscreen not supported.");
+          }
+        };
+
+        aboutBlankBtn.onclick = () => {
+          if (!currentGame || !currentGame.url) return;
+          const html = `
+            <html>
+              <head><title>${currentGame.name}</title></head>
+              <body style="margin:0;background:#000;">
+                <iframe src="${currentGame.url}" frameborder="0" style="width:100vw;height:100vh;border:none;" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+              </body>
+            </html>
+          `;
+          const win = window.open();
+          win.document.open();
+          win.document.write(html);
+          win.document.close();
+        };
+
+        downloadBtn.onclick = () => {
+          if (!currentGame || !currentGame.url) return;
+          const fileContent = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>${currentGame.name}</title>
+    <style>
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: #000;
+      }
+      iframe {
+        border: none;
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe src="${currentGame.url}" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+  </body>
+</html>
+          `.trim();
+
+          const blob = new Blob([fileContent], { type: 'text/html' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${currentGame.name.replace(/\s+/g, '_').toLowerCase()}.html`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        };
+      }
+
+      // Close game modal
+      closeGameModal.onclick = () => {
+        gameModal.classList.remove('active');
+        gameIframe.src = '';
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        }
+      };
+      // Tab controls and navigation logic
+      const pageTitle = document.getElementById('pageTitle');
+
+      const tabs = {
+        home: () => {
+          pageTitle.textContent = 'PHOENIX';
+          document.querySelector('.changing-text').style.display = 'block';
+          document.getElementById('homePageContent').style.display = 'block';
+          gamesContent.style.display = 'none';
+          document.getElementById('appsContent').style.display = 'none';
+          document.getElementById('proxiesContent').style.display = 'none';
+          document.getElementById('aiContent').style.display = 'none';
+          document.getElementById('chatContent').style.display = 'none';
+          document.getElementById('contactContent').style.display = 'none';
+        },
+        games: () => {
+          pageTitle.textContent = 'GAMES';
+          document.querySelector('.changing-text').style.display = 'none';
+          document.getElementById('homePageContent').style.display = 'none';
+          gamesContent.style.display = 'block';
+          document.getElementById('appsContent').style.display = 'none';
+          document.getElementById('proxiesContent').style.display = 'none';
+          document.getElementById('aiContent').style.display = 'none';
+          document.getElementById('chatContent').style.display = 'none';
+          document.getElementById('contactContent').style.display = 'none';
+          populateGameButtons();
+        },
+        apps: () => {
+          pageTitle.textContent = 'APPS';
+          document.querySelector('.changing-text').style.display = 'none';
+          document.getElementById('homePageContent').style.display = 'none';
+          gamesContent.style.display = 'none';
+          document.getElementById('appsContent').style.display = 'block';
+          document.getElementById('proxiesContent').style.display = 'none';
+          document.getElementById('aiContent').style.display = 'none';
+          document.getElementById('chatContent').style.display = 'none';
+          document.getElementById('contactContent').style.display = 'none';
+        },
+        proxies: () => {
+          pageTitle.textContent = 'PROXIES';
+          document.querySelector('.changing-text').style.display = 'none';
+          document.getElementById('homePageContent').style.display = 'none';
+          gamesContent.style.display = 'none';
+          document.getElementById('appsContent').style.display = 'none';
+          document.getElementById('proxiesContent').style.display = 'block';
+          document.getElementById('aiContent').style.display = 'none';
+          document.getElementById('chatContent').style.display = 'none';
+          document.getElementById('contactContent').style.display = 'none';
+        },
+        ai: () => {
+          pageTitle.textContent = 'AI';
+          document.querySelector('.changing-text').style.display = 'none';
+          document.getElementById('homePageContent').style.display = 'none';
+          gamesContent.style.display = 'none';
+          document.getElementById('appsContent').style.display = 'none';
+          document.getElementById('proxiesContent').style.display = 'none';
+          document.getElementById('aiContent').style.display = 'block';
+          document.getElementById('chatContent').style.display = 'none';
+          document.getElementById('contactContent').style.display = 'none';
+        },
+        chat: () => {
+          pageTitle.textContent = 'CHAT';
+          document.querySelector('.changing-text').style.display = 'none';
+          document.getElementById('homePageContent').style.display = 'none';
+          gamesContent.style.display = 'none';
+          document.getElementById('appsContent').style.display = 'none';
+          document.getElementById('proxiesContent').style.display = 'none';
+          document.getElementById('aiContent').style.display = 'none';
+          document.getElementById('chatContent').style.display = 'block';
+          document.getElementById('contactContent').style.display = 'none';
+        },
+        contact: () => {
+          pageTitle.textContent = 'CONTACT';
+          document.querySelector('.changing-text').style.display = 'none';
+          document.getElementById('homePageContent').style.display = 'none';
+          gamesContent.style.display = 'none';
+          document.getElementById('appsContent').style.display = 'none';
+          document.getElementById('proxiesContent').style.display = 'none';
+          document.getElementById('aiContent').style.display = 'none';
+          document.getElementById('chatContent').style.display = 'none';
+          document.getElementById('contactContent').style.display = 'block';
+        },
+        settings: () => {
+          // Settings will be handled via modal
+          document.getElementById('settingsModal').style.display = 'flex';
+          document.getElementById('settingsModal').focus();
+        }
+      };
+
+      // Set active nav tab
+      function setActiveNav(el) {
+        document.querySelectorAll('.nav-icon').forEach(i => {
+          i.classList.remove('active');
+          i.setAttribute('aria-pressed', 'false');
+        });
+        el.classList.add('active');
+        el.setAttribute('aria-pressed', 'true');
+
+        const tab = el.dataset.tab || 'home';
+        if (tabs[tab]) tabs[tab]();
+      }
+
+      // Helper for cards to switch tabs
+      function setActiveNavByTab(tabName) {
+        const navIcons = document.querySelectorAll('.nav-icon');
+        navIcons.forEach(icon => {
+          if (icon.dataset.tab === tabName) {
+            icon.click();
+          }
+        });
+      }
+
+      // Show home by default on load
+      tabs.home();
+                // Quick Settings modal logic
+      const settingsBtn = document.getElementById('settingsBtn');
+      const settingsModal = document.getElementById('settingsModal');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+
+      settingsBtn.onclick = () => {
+        settingsModal.classList.add('active');
+        settingsModal.style.display = 'flex';
+        settingsModal.focus();
+      };
+
+      closeModalBtn.onclick = () => {
+        settingsModal.classList.remove('active');
+        settingsModal.style.display = 'none';
+      };
+
+      window.onclick = e => {
+        if (e.target === settingsModal) {
+          settingsModal.classList.remove('active');
+          settingsModal.style.display = 'none';
+        }
+      };
+
+      // Outline/Accent Color Picker logic
+      const colorDots = document.querySelectorAll('.color-dot');
+      colorDots.forEach(dot => {
+        dot.onclick = () => {
+          const color = dot.dataset.color;
+          document.documentElement.style.setProperty('--outline', color);
+          document.documentElement.style.setProperty('--accent', color);
+          colorDots.forEach(c => c.classList.remove('selected'));
+          dot.classList.add('selected');
+        };
+      });
+
+      // Cloaking logic
+      const cloakBar = document.getElementById('cloakBar');
+      const cloakLabel = document.getElementById('cloakLabel');
+      const cloakSelect = document.getElementById('cloakSelect');
+      const uncloakBtn = document.getElementById('uncloakBtn');
+
+      function applyCloak(type) {
+        if (type === 'none') {
+          cloakBar.classList.remove('active');
+          cloakBar.style.display = 'none';
+          document.title = 'Phoenix';
+          setFavicon('default');
+          return;
+        }
+
+        cloakBar.classList.add('active');
+        cloakBar.style.display = 'flex';
+
+        let label = '', title = '', favicon = '';
+
+        switch(type) {
+          case 'classroom':
+            label = 'Google Classroom';
+            title = 'Classes';
+            favicon = 'https://ssl.gstatic.com/classroom/ic_product_classroom_32.png';
+            break;
+          case 'docs':
+            label = 'Google Docs';
+            title = 'Untitled document - Google Docs';
+            favicon = 'https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico';
+            break;
+          case 'drive':
+            label = 'Google Drive';
+            title = 'My Drive - Google Drive';
+            favicon = 'https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png';
+            break;
+          case 'youtube':
+            label = 'YouTube';
+            title = 'YouTube';
+            favicon = 'https://www.youtube.com/s/desktop/6e6e5d1b/img/favicon_32x32.png';
+            break;
+        }
+
+        cloakLabel.textContent = `Cloaked as: ${label}`;
+        document.title = title;
+        setFavicon(favicon);
+      }
+
+      cloakSelect.onchange = e => applyCloak(e.target.value);
+      uncloakBtn.onclick = () => {
+        cloakSelect.value = 'none';
+        applyCloak('none');
+      };
+
+      function setFavicon(url) {
+        document.querySelectorAll('link[rel="icon"]').forEach(e => e.remove());
+        if (url === 'default') return;
+        const link = document.createElement('link');
+        link.rel = 'icon';
+        link.href = url;
+        document.head.appendChild(link);
+      }
+
+      // Panic Key: ESC for fast cloaking (classroom)
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          cloakSelect.value = 'classroom';
+          applyCloak('classroom');
+          settingsModal.classList.remove('active');
+          settingsModal.style.display = 'none';
+        }
+      });
+
+      // Clicking cloak bar uncloaks
+      cloakBar.onclick = () => {
+        cloakSelect.value = 'none';
+        applyCloak('none');
+      };
+
+      // Scroll Down Button Logic for Home Page Reveal
+      document.getElementById('scrollDownBtn').addEventListener('click', () => {
+        document.getElementById('tabSections').scrollIntoView({ behavior: 'smooth' });
+      });
+
+      // Reveal animation logic for home
+      const revealDiv = document.getElementById('homeReveal');
+      const arrowBtn = document.getElementById('scrollDownBtn');
+      let revealed = false;
+
+      function doReveal() {
+        if (!revealed) {
+          if (revealDiv) {
+            revealDiv.style.opacity = '1';
+            revealDiv.style.pointerEvents = 'auto';
+          }
+          setTimeout(() => {
+            const tabSections = document.getElementById('tabSections');
+            if(tabSections) tabSections.scrollIntoView({behavior:"smooth"});
+          }, 80);
+          revealed = true;
+        }
+      }
+
+      if (arrowBtn) {
+        arrowBtn.addEventListener('click', doReveal);
+      }
+
+      window.addEventListener('scroll', function() {
+        if (!revealed && window.scrollY > window.innerHeight/3) {
+          doReveal();
+        }
+      });
+
+      // Diagnostics Button Logic
+      const runBtn = document.getElementById('runDiagnosticsBtn');
+      const output = document.getElementById('diagnosticsOutput');
+
+      runBtn.addEventListener('click', () => {
+        runBtn.disabled = true;
+        output.innerHTML = `
+          <div>Running Diagnostics...</div>
+          <div id="loadingBarContainer"><div id="loadingBar"></div></div>
+        `;
+        const loadingBar = document.getElementById('loadingBar');
+
+        // Simulate loading progress
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 5;
+          loadingBar.style.width = progress + '%';
+          if (progress >= 100) {
+            clearInterval(interval);
+            showDiagnosticsResults();
+            runBtn.disabled = false;
+          }
+        }, 100);
+      });
+
+      function showDiagnosticsResults() {
+        // Simulated diagnostic data
+        const diagnostics = {
+          "Server Status": "Online",
+          "Deployment Status": "Stable",
+          "Connection Status": "Good",
+          "Battery Status": navigator.getBattery ? "Checking..." : "Unavailable",
+          "WiFi Status": navigator.connection ? navigator.connection.effectiveType : "Unknown",
+          "Block Status": "Not Blocked",
+          "Games": "Accessible",
+          "Proxies": "Accessible",
+          "Apps": "Accessible",
+          "AI": "Accessible",
+          "Chat": "Accessible",
+          "Contact": "Accessible",
+          "Settings": "Accessible"
+        };
+
+        // For Battery Status, if supported, update asynchronously
+        if (navigator.getBattery) {
+          navigator.getBattery().then(battery => {
+            diagnostics["Battery Status"] = `${Math.round(battery.level * 100)}% ${battery.charging ? "(Charging)" : ""}`;
+            renderDiagnostics(diagnostics);
+          });
+        } else {
+          renderDiagnostics(diagnostics);
+        }
+      }
+
+      function renderDiagnostics(diagnostics) {
+        let html = '<ul style="list-style:none;padding-left:0;">';
+        for (const [key, value] of Object.entries(diagnostics)) {
+          html += `<li><strong>${key}:</strong> ${value}</li>`;
+        }
+        html += '</ul>';
+        output.innerHTML = html;
+      }
+
+    </script>
+  </body>
+</html>
+
+

@@ -482,7 +482,13 @@
   <div id="gameModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="gameModalTitle" tabindex="-1">
     <div class="modal-content">
       <button id="closeGameModal" aria-label="Close Game" class="close-btn">&times;</button>
-      <iframe id="gameIframe" src="" frameborder="0" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+      <iframe 
+        id="gameIframe" 
+        src=""
+        frameborder="0" 
+        allowfullscreen
+        sandbox="allow-scripts allow-same-origin allow-forms">
+        </iframe>
       <div class="modal-controls">
         <button id="fullscreenBtn" class="control-btn" title="Fullscreen">Fullscreen</button>
         <button id="aboutBlankBtn" class="control-btn" title="Open in about:blank">Open in about:blank</button>
@@ -635,32 +641,85 @@
     gameIframe.src = game.url;
     gameModal.classList.add('active');
 
-    fullscreenBtn.onclick = () => {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        if (gameModal.requestFullscreen) {
-          gameModal.requestFullscreen();
-        } else if (gameModal.webkitRequestFullscreen) {
-          gameModal.webkitRequestFullscreen();
-        } else if (gameModal.msRequestFullscreen) {
-          gameModal.msRequestFullscreen();
-        }
-      }
-    };
-    aboutBlankBtn.onclick = () => {
-      window.open(game.url, 'about:blank');
-    };
-    downloadBtn.onclick = () => {
-      const a = document.createElement('a');
-      a.href = game.download;
-      a.download = '';
-      a.target = '_blank';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    };
+fullscreenBtn.onclick = () => {
+  const iframe = document.getElementById('gameIframe');
+
+  if (iframe.requestFullscreen) {
+    iframe.requestFullscreen();
+  } else if (iframe.webkitRequestFullscreen) {
+    iframe.webkitRequestFullscreen(); // Safari
+  } else if (iframe.msRequestFullscreen) {
+    iframe.msRequestFullscreen(); // IE11
+  } else {
+    alert("Your browser doesn't support fullscreen mode.");
   }
+};
+
+
+   aboutBlankBtn.onclick = () => {
+  if (!currentGame || !currentGame.url) return;
+  const html = `
+    <html>
+      <head>
+        <title>${currentGame.name}</title>
+        <style>
+          html, body { margin: 0; height: 100%; background: #000; }
+          iframe {
+            border: none;
+            width: 100vw;
+            height: 100vh;
+          }
+        </style>
+      </head>
+      <body>
+        <iframe src="${currentGame.url}" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+      </body>
+    </html>
+  `;
+  const win = window.open();
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+};
+
+   downloadBtn.onclick = () => {
+  if (!currentGame || !currentGame.url) return;
+  const fileContent = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>${currentGame.name}</title>
+    <style>
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: #000;
+      }
+      iframe {
+        border: none;
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe src="${currentGame.url}" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+  </body>
+</html>
+  `.trim();
+
+  const blob = new Blob([fileContent], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${currentGame.name.replace(/\s+/g, '_').toLowerCase()}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
 
   // Close modal and reset iframe
   closeGameModal.onclick = () => {

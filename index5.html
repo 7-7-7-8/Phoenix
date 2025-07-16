@@ -199,40 +199,96 @@ body {
   outline: 2.5px solid var(--outline-hover);
   transform: translateY(-2px) scale(1.025);
 }
-
-/* For game buttons: more spacing, larger, neater */
+/* Outlined game buttons with centered text */
 .game-btns-list {
   margin-top: 44px;
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  align-items: stretch;
+  gap: 20px;
   max-width: 420px;
   margin-left: auto;
   margin-right: auto;
 }
-.control-btn {
-  background: var(--outline);
-  border: none;
-  padding: 16px 0;
-  border-radius: 14px;
-  font-size: 1.18rem;
+  .modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg2);
+  border-radius: 18px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90vw;
+  box-shadow: 0 0 40px var(--accent);
+  z-index: 1200;
+}
+
+.modal.active {
+  display: block;
+}
+
+
+.game-btn {
+  border: 2.5px solid var(--outline);
+  background: transparent;
+  padding: 14px 0;
+  border-radius: 16px;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #19191d;
+  color: var(--accent);
   cursor: pointer;
-  width: 100%;
-  box-shadow: 0 2px 14px #ff910027;
-  transition: background 0.3s, box-shadow 0.3s, color 0.2s, letter-spacing 0.22s;
-  letter-spacing: 0.01em;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: none; /* Remove filled shadow */
 }
-.control-btn:hover,
-.control-btn:focus {
+
+.game-btn:hover,
+.game-btn:focus {
   background: var(--outline-hover);
-  color: #0b0b0b;
-  outline: 0;
-  box-shadow: 0 2px 22px var(--outline-hover);
-  letter-spacing: 0.04em;
+  color: #19191d;
+  box-shadow: 0 3px 12px var(--outline-hover);
+  outline: none;
 }
+  <head>
+  <!-- your other head elements here -->
+  <style>
+    /* Existing styles... */
+    
+    #gameModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--bg2);
+      border-radius: 16px;
+      box-shadow: 0 0 40px rgb(255 145 0 / 0.6);
+      width: 90vw;
+      max-width: 900px;
+      height: 80vh;
+      display: none;
+      flex-direction: column;
+      z-index: 1100;
+      outline: none;
+    }
+
+    #gameModal.active {
+      display: flex;
+    }
+
+    #gameModal::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: -1;
+      border-radius: 16px;
+    }
+    
+    /* Any other CSS you have */
+  
+
+
   .settings-group {
   margin-bottom: 1rem;
 }
@@ -678,7 +734,7 @@ function populateGameButtons(){
   games.forEach(game=>{
     const btn=document.createElement("button");
     btn.textContent=game.name;
-    btn.className="control-btn";
+    btn.className="game-btn"; // <- updated class here
     btn.onclick=()=>openGameModal(game);
     list.appendChild(btn);
   });
@@ -825,6 +881,20 @@ document.getElementById("gotoSettingsTab").onclick=()=>{
   setActiveNavByTab("settings");
   populateSettingsFields();
 };
+  document.getElementById('quickSettingsFAB').onclick = () => {
+  document.getElementById('settingsModal').classList.toggle('active');
+};
+document.getElementById('closeModalBtn').onclick = () => {
+  document.getElementById('settingsModal').classList.remove('active');
+};
+// Also close modal if click outside content
+window.onclick = (e) => {
+  const modal = document.getElementById('settingsModal');
+  if (e.target === modal) {
+    modal.classList.remove('active');
+  }
+};
+
 
 // ----- Full Settings Page: Populate, Save, Reset -----
 function populateSettingsFields(){

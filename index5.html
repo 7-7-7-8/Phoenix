@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Phoenix</title>
+<link rel="icon" href="/favicon.ico" />
+<style>
+:root {
+  --nav-width: 72px;
+  --nav-width-expanded: 214px;
+  --outline: #ff9100;
+  --outline-hover: #ffaa33;
+  --accent: #ff9100;
+  --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-title: 'Orbitron', 'Segoe UI', Arial, sans-serif;
+  --bg-color: #111;
+  --bg2: #19191d;
+  --text-light: #ddd;
+  --transition: all 0.25s cubic-bezier(0.4, 1.3, 0.6, 1);
+  --nav-label-delay: 0.12s;
+  --section-btn-gap: 22px;
+}
+
+body {
+  margin: 0; padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-light);
+  font-family: var(--font-main);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.side-nav {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: var(--nav-width);
+  background: rgba(20, 20, 22, 0.98);
+  box-shadow: 2px 0 24px #0002;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 32px;
+  transition: width 0.25s cubic-bezier(0.4, 1.3, 0.6, 1);
+  z-index: 1000;
+  user-select: none;
+}
+.side-nav:hover,
+.side-nav:focus-within {
+  width: var(--nav-width-expanded);
+  border-right: 2px solid var(--outline);
+}
+
+.nav-icon {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 18px 0 18px 16px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: var(--transition);
+  outline: none;
+}
+
+.nav-icon svg {
+  width: 26px; height: 26px;
+  stroke: var(--outline);
+  fill: none;
+  stroke-width: 2.3;
+  transition: stroke 0.2s;
+  flex-shrink: 0;
+}
+
+.nav-icon.active,
+.nav-icon:hover,
+.nav-icon:focus {
+  background: rgba(255, 145, 0, 0.12);
+  box-shadow: 0 2px 16px #ff910022;
+  border-color: var(--outline);
+}
+
+.nav-icon.active svg,
+.nav-icon:hover svg,
+.nav-icon:focus svg {
+  stroke: var(--outline-hover);
+}
+
+.nav-label {
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  white-space: nowrap;
+  max-width: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.23s, max-width 0.23s;
+  transition-delay: 0s;
+}
+
+.side-nav:hover .nav-label,
+.side-nav:focus-within .nav-label {
+  opacity: 1;
+  max-width: 160px;
+  pointer-events: auto;
+  transition-delay: var(--nav-label-delay);
+}
+
+.main-content {
+  margin-left: var(--nav-width);
+  padding: 24px 7vw 48px 7vw;
+  transition: margin-left 0.25s cubic-bezier(0.4, 1.3, 0.6, 1);
+  min-height: 100vh;
+}
+.side-nav:hover ~ .main-content,
+.side-nav:focus-within ~ .main-content {
+  margin-left: var(--nav-width-expanded);
+}
+
+.phoenix-title {
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 5rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-shadow: 0 2px 24px #ff910033;
+  margin-top: 90px;
+  margin-bottom: 12px;
+  user-select: none;
+  text-align: center;
+}
+
+.changing-text {
+  font-family: var(--font-main);
+  font-size: 1.7rem;
+  color: var(--outline);
+  letter-spacing: 0.06em;
+  height: 2.2rem;
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+  text-align: center;
+}
+
+.changing-text span {
+  position: absolute;
+  width: 100%;
+  opacity: 0;
+  animation: fadeScroll 12s linear infinite;
+}
+
+.changing-text span:nth-child(1) { animation-delay: 0s; }
+.changing-text span:nth-child(2) { animation-delay: 4s; }
+.changing-text span:nth-child(3) { animation-delay: 8s; }
+
+@keyframes fadeScroll {
+  0% { opacity: 0; transform: translateY(30%); }
+  10% { opacity: 1; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(0); }
+  40% { opacity: 0; transform: translateY(-30%); }
+  100% { opacity: 0; transform: translateY(-30%); }
+}
+
+/* Section full-width pretty buttons (apps, proxies, ai, chat) */
+.section-btns {
+  width: 100%;
+  max-width: 620px;
+  margin: 48px auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-btn-gap);
+  align-items: stretch;
+}
+
+.section-btn {
+  padding: 22px;
+  border: none;
+  border-radius: 18px;
+  background: var(--bg2);
+  color: var(--accent);
+  font-size: 1.35rem;
+  font-family: var(--font-title);
+  font-weight: 600;
+  box-shadow: 0 2px 34px #ff910022, 0 1.5px 0 var(--outline) inset;
+  outline: 2.2px solid var(--outline);
+  margin: 0;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(.45,1.5,.5,1.05);
+  position: relative;
+}
+.section-btn:hover,
+.section-btn:focus {
+  background: var(--outline);
+  color: #19191d;
+  box-shadow: 0 2px 34px var(--outline-hover);
+  outline: 2.5px solid var(--outline-hover);
+  transform: translateY(-2px) scale(1.025);
+}
+
+/* For game buttons: more spacing, larger, neater */
+.game-btns-list {
+  margin-top: 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  align-items: stretch;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.control-btn {
+  background: var(--outline);
+  border: none;
+  padding: 16px 0;
+  border-radius: 14px;
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #19191d;
+  cursor: pointer;
+  width: 100%;
+  box-shadow: 0 2px 14px #ff910027;
+  transition: background 0.3s, box-shadow 0.3s, color 0.2s, letter-spacing 0.22s;
+  letter-spacing: 0.01em;
+}
+.control-btn:hover,
+.control-btn:focus {
+  background: var(--outline-hover);
+  color: #0b0b0b;
+  outline: 0;
+  box-shadow: 0 2px 22px var(--outline-hover);
+  letter-spacing: 0.04em;
+}
+  .settings-group {
+  margin-bottom: 1rem;
+}
+.settings-group input[type="text"],
+.settings-group input[type="color"],
+.settings-group select {
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: #181818;
+  border: 1px solid #444;
+  color: #eee;
+  max-width: 100%;
+  font-size: 1rem;
+}
+.settings-group small {
+  font-size: 0.82rem;
+  color: #aaa;
+  display: block;
+  margin-top: 4px;
+}
+
+
+/* Cloak bar */
+.cloak-bar {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: #232526;
+  color: #fff;
+  padding: 8px 24px;
+  font-size: 1rem;
+  z-index: 1000;
+  border-bottom: 2px solid var(--outline);
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.2s;
+  user-select: none;
+}
+.cloak-bar.active {
+  display: flex;
+}
+.cloak-bar button {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 12px;
+  user-select: none;
+}
+/* Responsive: for mobile and small screens */
+@media (max-width: 700px) {
+  .main-content { padding: 18px 1vw 56px 1vw; }
+  .side-nav { width: var(--nav-width); }
+  .side-nav:hover, .side-nav:focus-within { width: var(--nav-width-expanded); }
+  .phoenix-title { font-size: 2.3rem; margin-top: 45px;}
+  .section-btns { max-width: 99vw; }
+  .game-btns-list { max-width: 98vw; }
+}
+</style>
+</head>
+<body>
+<!-- Sidebar Navigation -->
+<div class="side-nav">
+  <div class="nav-icon active" data-tab="home" onclick="setActiveNav(this)">
+    <!-- Home Icon (House) -->
+    <svg viewBox="0 0 24 24"><path d="M3 12L12 5l9 7v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+    <span class="nav-label">Home</span>
+  </div>
+  <div class="nav-icon" data-tab="games" onclick="setActiveNav(this)">
+    <!-- Gamepad Icon -->
+    <svg viewBox="0 0 24 24"><path d="M6 16a3 3 0 01-3-3v0a3 3 0 013-3h6a3 3 0 010 6H6zM17.5 9.5L17.51 9.5"/></svg>
+    <span class="nav-label">Games</span>
+  </div>
+  <div class="nav-icon" data-tab="apps" onclick="setActiveNav(this)">
+    <!-- Grid Icon -->
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+    <span class="nav-label">Apps</span>
+  </div>
+  <div class="nav-icon" data-tab="proxies" onclick="setActiveNav(this)">
+    <!-- List Icon -->
+    <svg viewBox="0 0 24 24"><path d="M4 4h16v2H4zM4 10h16v2H4zM4 16h16v2H4z"/></svg>
+    <span class="nav-label">Proxies</span>
+  </div>
+  <div class="nav-icon" data-tab="ai" onclick="setActiveNav(this)">
+    <!-- AI Brain Icon -->
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.8 1.8 0 0 0 .1-3.3c-.2-.5-.3-1-.5-1.5a1.8 1.8 0 0 0-.2-3.2 7.5 7.5 0 0 0-3.8-2.4 1.7 1.7 0 0 0-3-1A7.5 7.5 0 0 0 5 7a1.7 1.7 0 0 0-1 3c-.1.5-.3 1-.3 1.5a1.7 1.7 0 0 0 .2 2.8 7.5 7.5 0 0 0 3.8 2.4 1.7 1.7 0 0 0 3 1c.5.1 1 .2 1.5.2a1.7 1.7 0 0 0 2.7-.6 7.5 7.5 0 0 0 3.5-3.3z"/></svg>
+    <span class="nav-label">AI</span>
+  </div>
+  <div class="nav-icon" data-tab="chat" onclick="setActiveNav(this)">
+    <!-- Chat Bubble Icon -->
+    <svg viewBox="0 0 24 24"><path d="M3 21v-5a9 9 0 019-9h6a6 6 0 010 12h-6a3 3 0 00-3 3z"/></svg>
+    <span class="nav-label">Chat</span>
+  </div>
+  <div class="nav-icon" data-tab="contact" onclick="setActiveNav(this)">
+    <!-- Mail Icon -->
+    <svg viewBox="0 0 24 24"><path d="M3 5h18M3 5l9 9 9-9M5 19h14a2 2 0 002-2V8l-9 9-9-9v9a2 2 0 002 2z"/></svg>
+    <span class="nav-label">Contact</span>
+  </div>
+  <div class="nav-icon" data-tab="settings" onclick="setActiveNav(this)">
+    <!-- Settings Gear Icon -->
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.8 1.8 0 0 0 .1-3.3c-.2-.5-.3-1-.5-1.5a1.8 1.8 0 0 0-.2-3.2 7.5 7.5 0 0 0-3.8-2.4 1.7 1.7 0 0 0-3-1A7.5 7.5 0 0 0 5 7a1.7 1.7 0 0 0-1 3c-.1.5-.3 1-.3 1.5a1.7 1.7 0 0 0 .2 2.8 7.5 7.5 0 0 0 3.8 2.4 1.7 1.7 0 0 0 3 1c.5.1 1 .2 1.5.2a1.7 1.7 0 0 0 2.7-.6 7.5 7.5 0 0 0 3.5-3.3z"/></svg>
+    <span class="nav-label">Settings</span>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Phoenix Header on Home -->
+  <h1 class="phoenix-title" id="pageTitle">PHOENIX</h1>
+  <div class="changing-text">
+    <span>Innovate.</span>
+    <span>Empower.</span>
+    <span>Transform.</span>
+  </div>
+
+  <!-- Content Tabs -->
+  <div id="homeContent" style="margin-top:60px;"></div>
+  <div id="gamesContent" style="display:none;"></div>
+  <div id="appsContent" style="display:none;">
+    <div class="section-btns" id="appsSectionBtns">
+      <!-- Full-width app buttons will go here -->
+    </div>
+  </div>
+  <div id="proxiesContent" style="display:none;">
+    <div class="section-btns" id="proxiesSectionBtns">
+      <!-- Full-width proxy buttons will go here -->
+    </div>
+  </div>
+  <div id="aiContent" style="display:none;">
+    <div class="section-btns" id="aiSectionBtns">
+      <!-- Full-width AI tool buttons will go here -->
+    </div>
+  </div>
+  <div id="chatContent" style="display:none;">
+    <div class="section-btns" id="chatSectionBtns">
+      <!-- Full-width chat tool buttons will go here -->
+    </div>
+  </div>
+  <div id="contactContent" style="display:none;"></div>
+  <div id="settingsContent" style="display:none;">
+    <div class="settings-panel" style="max-width:700px;margin:48px auto;display:flex;flex-direction:column;gap:24px;">
+  <h2 style="font-size:2.2rem;color:var(--accent);margin-bottom:12px;">Phoenix &lt;/settings&gt;</h2>
+
+  <div class="settings-group">
+    <label for="panicKeyInput"><strong>Panic Key:</strong></label>
+    <input type="text" id="panicKeyInput" maxlength="1" style="width:3rem;text-align:center" />
+    <small>Press this key anytime to instantly redirect.</small>
+  </div>
+
+  <div class="settings-group">
+    <label for="panicUrlInput"><strong>Panic Redirect URL:</strong></label>
+    <input type="text" id="panicUrlInput" placeholder="https://classroom.google.com" />
+    <small>Where you’ll go when you hit the panic key (Escape, P, etc).</small>
+  </div>
+
+  <div class="settings-group">
+    <label>
+      <input type="checkbox" id="enableClickoffCloak" />
+      <strong>Auto-Cloak on Tab Blur</strong>
+    </label>
+    <small>When you click off the tab (or switch tabs), auto cloak.</small>
+  </div>
+
+  <div class="settings-group">
+    <label for="fontSelectTab"><strong>Font:</strong></label>
+    <select id="fontSelectTab">
+      <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI</option>
+      <option value="'Orbitron', Arial, sans-serif">Orbitron</option>
+      <option value="'Roboto', Arial, sans-serif">Roboto</option>
+      <option value="'Ubuntu', Arial, sans-serif">Ubuntu</option>
+    </select>
+  </div>
+
+  <div class="settings-group">
+    <label for="themeSelectTab"><strong>Theme:</strong></label>
+    <select id="themeSelectTab">
+      <option value="dark">Dark</option>
+      <option value="dim">Dim</option>
+      <option value="solarized">Solarized</option>
+      <option value="glass">Glass</option>
+    </select>
+  </div>
+
+  <div class="settings-group">
+    <label for="canvasSelect"><strong>Game Sandbox Mode:</strong></label>
+    <select id="canvasSelect">
+      <option value="default">Standard</option>
+      <option value="strict">Strict (more security)</option>
+      <option value="open">Open (less secure)</option>
+    </select>
+    <small>Controls iframe sandboxing when loading games.</small>
+  </div>
+
+  <div class="settings-group">
+    <label><input type="checkbox" id="animationsToggle" /> <strong>Enable Animations</strong></label>
+  </div>
+
+  <div class="settings-group">
+    <label for="tabCloakSelectTab"><strong>Default Tab Cloak:</strong></label>
+    <select id="tabCloakSelectTab">
+      <option value="none">None</option>
+      <option value="docs">Google Docs</option>
+      <option value="forms">Google Forms</option>
+      <option value="classroom">Google Classroom</option>
+      <option value="drive">Google Drive</option>
+      <option value="gmail">Gmail</option>
+      <option value="translate">Google Translate</option>
+      <option value="calendar">Google Calendar</option>
+      <option value="meet">Google Meet</option>
+      <option value="youtube">YouTube</option>
+      <option value="notion">Notion</option>
+      <option value="slack">Slack</option>
+      <option value="trello">Trello</option>
+      <option value="github">GitHub</option>
+      <option value="replit">Replit</option>
+      <option value="jsfiddle">JSFiddle</option>
+      <option value="figma">Figma</option>
+      <option value="powerschool">PowerSchool</option>
+      <option value="schoology">Schoology</option>
+      <option value="clever">Clever</option>
+      <option value="canvas">Canvas LMS</option>
+      <option value="zoom">Zoom</option>
+      <option value="peardeck">Pear Deck</option>
+      <option value="edmodo">Edmodo</option>
+      <option value="quizlet">Quizlet</option>
+      <option value="desmos">Desmos</option>
+      <option value="flipgrid">Flipgrid</option>
+      <option value="typingclub">TypingClub</option>
+      <option value="blocked">Blocked Page (403)</option>
+      <option value="blank">Blank (no title or favicon)</option>
+    </select>
+  </div>
+
+  <div style="margin-top: 24px; display:flex; gap:16px;">
+    <button id="saveSettingsBtn" class="control-btn">💾 Save Settings</button>
+    <button id="resetSettingsBtn" class="control-btn" style="background:#333;color:#eee">♻️ Reset to Default</button>
+  </div>
+</div>
+
+  </div>
+</div>
+  <!-- Game Modal Overlay -->
+<div id="gameModal">
+  <button class="close-btn" id="closeGameModal" aria-label="Close Game Modal">&times;</button>
+  <iframe id="gameIframe"
+    title="Game window"
+    allowfullscreen
+    sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock"
+    style="flex:1 1 auto; min-height:340px; width:100%; border-radius:0 0 16px 16px;"></iframe>
+  <div class="modal-controls">
+    <button id="fullscreenBtn" class="control-btn" title="Fullscreen this game">Fullscreen</button>
+    <button id="aboutBlankBtn" class="control-btn" title="Open in about:blank window">About:Blank</button>
+    <button id="downloadBtn" class="control-btn" title="Download this game as HTML">Download</button>
+  </div>
+</div>
+
+<!-- Cloak Bar for Stealth (tab-only, not full UI cloak) -->
+<div id="cloakBar" class="cloak-bar">
+  <span id="cloakLabel"></span>
+  <button id="uncloakBtn">Uncloak</button>
+</div>
+
+<!-- Quick Settings Floating FAB Button -->
+<button class="quick-settings-btn" id="quickSettingsFAB" title="Quick Settings">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.8 1.8 0 0 0 .1-3.3c-.2-.5-.3-1-.5-1.5a1.8 1.8 0 0 0-.2-3.2 7.5 7.5 0 0 0-3.8-2.4 1.7 1.7 0 0 0-3-1A7.5 7.5 0 0 0 5 7a1.7 1.7 0 0 0-1 3c-.1.5-.3 1-.3 1.5a1.7 1.7 0 0 0 .2 2.8 7.5 7.5 0 0 0 3.8 2.4 1.7 1.7 0 0 0 3 1c.5.1 1 .2 1.5.2a1.7 1.7 0 0 0 2.7-.6 7.5 7.5 0 0 0 3.5-3.3z"/></svg>
+</button>
+
+<!-- Quick Settings Modal (only accent color and tab cloak picker) -->
+<div id="settingsModal" class="modal" tabindex="-1">
+  <div class="modal-content">
+    <button id="closeModalBtn" class="close-modal" aria-label="Close Settings">&times;</button>
+    <h2 style="color:var(--accent);margin-top:0;">Quick Settings</h2>
+    <!-- Accent Color -->
+    <div style="margin-bottom:1.2rem;">
+      <div style="font-weight:bold; margin-bottom:0.8rem;">Outline / Accent Color:</div>
+      <div class="color-picker">
+        <span class="color-dot" data-color="#ff9100" style="background:#ff9100;"></span>
+        <span class="color-dot" data-color="#00ffd0" style="background:#00ffd0;"></span>
+        <span class="color-dot" data-color="#82b1ff" style="background:#82b1ff;"></span>
+        <span class="color-dot" data-color="#e040fb" style="background:#e040fb;"></span>
+        <span class="color-dot" data-color="#ffee00" style="background:#ffee00;"></span>
+      </div>
+    </div>
+    <!-- Tab Cloak Dropdown -->
+    <div style="margin-bottom:1.3rem;">
+      <div style="font-weight:bold; margin-bottom:.3rem;">Tab Cloak:</div>
+      <select id="tabCloakSelect" style="padding:7px 16px; border-radius:6px; width:100%;">
+        <option value="none">None</option>
+        <option value="docs">Google Docs</option>
+        <option value="forms">Google Forms</option>
+        <option value="classroom">Google Classroom</option>
+        <option value="drive">Google Drive</option>
+        <option value="gmail">Gmail</option>
+        <option value="translate">Google Translate</option>
+        <option value="calendar">Google Calendar</option>
+        <option value="meet">Google Meet</option>
+        <option value="youtube">YouTube</option>
+        <option value="notion">Notion</option>
+        <option value="slack">Slack</option>
+        <option value="trello">Trello</option>
+        <option value="github">GitHub</option>
+        <option value="replit">Replit</option>
+        <option value="jsfiddle">JSFiddle</option>
+        <option value="figma">Figma</option>
+        <option value="powerschool">PowerSchool</option>
+        <option value="schoology">Schoology</option>
+        <option value="clever">Clever</option>
+        <option value="canvas">Canvas LMS</option>
+        <option value="zoom">Zoom</option>
+        <option value="peardeck">Pear Deck</option>
+        <option value="edmodo">Edmodo</option>
+        <option value="quizlet">Quizlet</option>
+        <option value="desmos">Desmos</option>
+        <option value="flipgrid">Flipgrid</option>
+        <option value="typingclub">TypingClub</option>
+        <option value="blocked">Blocked Page (403)</option>
+        <option value="blank">Blank Tab</option>
+        <!-- You can add more here easily -->
+      </select>
+    </div>
+    <div>
+      <button id="gotoSettingsTab" class="control-btn" style="margin-top:8px;">Full Settings Page</button>
+    </div>
+  </div>
+</div>
+<script>
+// ------- Settings Persistence -------
+const CLOAKS = {
+  none:       {title:"Phoenix", favicon:"/favicon.ico"},
+  docs:       {title:"Untitled document - Google Docs", favicon:"https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico"},
+  forms:      {title:"Untitled form - Google Forms", favicon:"https://ssl.gstatic.com/docs/forms/forms_favicon.ico"},
+  classroom:  {title:"Classes", favicon:"https://ssl.gstatic.com/classroom/ic_product_classroom_32.png"},
+  drive:      {title:"My Drive - Google Drive", favicon:"https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png"},
+  gmail:      {title:"Inbox (1) - user@gmail.com - Gmail", favicon:"https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico"},
+  translate:  {title:"Google Translate", favicon:"https://ssl.gstatic.com/translate/favicon.ico"},
+  calendar:   {title:"Google Calendar", favicon:"https://calendar.google.com/googlecalendar/images/favicon_v2015_6.ico"},
+  meet:       {title:"Meet - Video Call", favicon:"https://ssl.gstatic.com/meet/favicon.ico"},
+  youtube:    {title:"YouTube", favicon:"https://www.youtube.com/s/desktop/6e6e5d1b/img/favicon_32x32.png"},
+  notion:     {title:"Untitled – Notion", favicon:"https://www.notion.so/images/favicon.ico"},
+  slack:      {title:"Slack - #general", favicon:"https://a.slack-edge.com/80588/marketing/img/meta/favicon-32.png"},
+  trello:     {title:"Trello Board - Cards", favicon:"https://trello.com/favicon.ico"},
+  github:     {title:"github.com/user/project", favicon:"https://github.githubassets.com/favicons/favicon.svg"},
+  replit:     {title:"project.py – Replit", favicon:"https://replit.com/public/images/favicon.ico"},
+  jsfiddle:   {title:"JSFiddle Code Editor", favicon:"https://jsfiddle.net/favicon.ico"},
+  figma:      {title:"Figma Design System", favicon:"https://static.figma.com/app/icon/1/favicon.png"},
+  powerschool:{title:"Sign In - PowerSchool", favicon:"https://powerschool.com/wp-content/themes/powerschool/favicon.ico"},
+  schoology:  {title:"Courses - Schoology", favicon:"https://asset-cdn.schoology.com/sites/all/themes/schoology_theme/favicon.ico"},
+  clever:     {title:"Clever Dashboard", favicon:"https://clever.com/favicon.ico"},
+  canvas:     {title:"Dashboard - Instructure Canvas", favicon:"https://canvas.instructure.com/favicon.ico"},
+  zoom:       {title:"Zoom Meeting", favicon:"https://st1.zoom.us/zoom.ico"},
+  peardeck:   {title:"Join Instructions - Pear Deck", favicon:"https://www.peardeck.com/favicon.ico"},
+  edmodo:     {title:"Edmodo", favicon:"https://www.edmodo.com/favicon.ico"},
+  quizlet:    {title:"Flashcards", favicon:"https://assets.quizlet.com/a/j/dist/app/i/favicon.ico"},
+  desmos:     {title:"Desmos Graphing Calculator", favicon:"https://www.desmos.com/assets/calculator/favicon.ico"},
+  flipgrid:   {title:"Video Response - Flipgrid", favicon:"https://static.flipgrid.com/favicon.ico"},
+  typingclub: {title:"TypingClub", favicon:"https://www.typingclub.com/favicon.ico"},
+  blocked:    {title:"403 Forbidden", favicon:""},
+  blank:      {title:"", favicon:""}
+};
+function savePrefs(data) {
+  localStorage.setItem("phoenix-v4-prefs", JSON.stringify(data));
+}
+function loadPrefs() {
+  try { return JSON.parse(localStorage.getItem("phoenix-v4-prefs")||"{}"); } 
+  catch { return {}; }
+}
+function resetPrefs() {
+  localStorage.removeItem("phoenix-v4-prefs");
+  location.reload();
+}
+// ------- Default Settings -------
+const defaultPrefs = {
+  accent: "#ff9100",
+  font: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+  theme: "dark",
+  panicKey: "Escape",
+  panicUrl: "https://classroom.google.com",
+  clickoffCloak: false,
+  defaultCloak: "none",
+  currentCloak: "none",
+  sandbox: "default",
+  animations: true
+};
+let prefs = {...defaultPrefs, ...loadPrefs()};
+
+// ------- Style/Theme on Startup -------
+document.documentElement.style.setProperty('--outline', prefs.accent);
+document.documentElement.style.setProperty('--accent', prefs.accent);
+document.body.style.fontFamily = prefs.font;
+
+function applyTheme(theme) {
+  switch (theme) {
+    case "dim":
+      document.documentElement.style.setProperty('--bg-color', '#15151b');
+      document.documentElement.style.setProperty('--bg2', '#1b1b22');
+      break;
+    case "solarized":
+      document.documentElement.style.setProperty('--bg-color', '#002b36');
+      document.documentElement.style.setProperty('--bg2', '#073642');
+      break;
+    case "glass":
+      document.documentElement.style.setProperty('--bg-color', 'rgba(20,20,30,0.75)');
+      document.documentElement.style.setProperty('--bg2', 'rgba(35,35,55,0.55)');
+      break;
+    default: // "dark"
+      document.documentElement.style.setProperty('--bg-color', '#111');
+      document.documentElement.style.setProperty('--bg2', '#19191d');
+  }
+}
+applyTheme(prefs.theme);
+
+// ----- Navigation & Tabs -----
+function showTab(tab) {
+  document.querySelectorAll('.nav-icon').forEach(i => {
+    i.classList.toggle('active', i.dataset.tab === tab);
+  });
+  document.getElementById('pageTitle').textContent = tab==='home' ? 'PHOENIX' : tab.toUpperCase();
+  document.querySelector('.changing-text').style.display = tab==='home' ? 'block':'none';
+  ['homeContent','gamesContent','appsContent','proxiesContent','aiContent','chatContent','contactContent','settingsContent'].forEach(id => {
+    document.getElementById(id).style.display = (id.toLowerCase()===tab+'content')||(tab==='home'&&id==='homeContent')?'block':'none';
+  });
+}
+function setActiveNav(el) {
+  const tab = el.dataset.tab;
+  showTab(tab);
+  if(tab==="settings") populateSettingsFields();
+}
+function setActiveNavByTab(tab) {
+  document.querySelectorAll('.nav-icon').forEach(icon=>{
+    if(icon.dataset.tab===tab) icon.click();
+  });
+}
+// ----- Game Modal Logic -----
+const games = [
+  {name:"Bob The Robber 4",url:"https://7-7-7-8.github.io/BobTheRobber4/"},
+  {name:"2048 Fusion",url:"https://ucbg.github.io/2048-fusion/"}
+];
+function populateGameButtons(){
+  const gc=document.getElementById("gamesContent");
+  gc.innerHTML='<h2 style="color:var(--accent);">Games</h2><div class="game-btns-list" id="gameBtns"></div>';
+  const list=document.getElementById("gameBtns");
+  games.forEach(game=>{
+    const btn=document.createElement("button");
+    btn.textContent=game.name;
+    btn.className="control-btn";
+    btn.onclick=()=>openGameModal(game);
+    list.appendChild(btn);
+  });
+}
+populateGameButtons();
+const gameModal=document.getElementById("gameModal");
+const gameIframe=document.getElementById("gameIframe");
+function openGameModal(game){
+  gameIframe.src=game.url;
+  gameModal.classList.add("active"); gameModal.style.display="flex";
+  document.getElementById("fullscreenBtn").onclick=()=>{
+    if(gameIframe.requestFullscreen)gameIframe.requestFullscreen();
+  };
+  document.getElementById("aboutBlankBtn").onclick=()=>{
+    const html=`
+      <html>
+      <head><title>${game.name}</title></head>
+      <body style="margin:0;background:#000;">
+      <iframe src="${game.url}" frameborder="0" style="width:100vw;height:100vh;border:none;" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+      </body>
+      </html>
+    `.trim();
+    const win=window.open();
+    win.document.open(); win.document.write(html); win.document.close();
+  };
+  document.getElementById("downloadBtn").onclick=()=>{
+    const blob=new Blob([`
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>${game.name}</title><style>
+html,body{margin:0;height:100%;background:#000;}iframe{border:none;width:100vw;height:100vh;}
+</style></head><body>
+<iframe src="${game.url}" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+</body></html>
+    `],{type:"text/html"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download=game.name.replace(/\s+/g,"_").toLowerCase()+".html";
+    a.click(); URL.revokeObjectURL(a.href);
+  };
+}
+document.getElementById("closeGameModal").onclick=()=>{
+  gameModal.classList.remove("active");
+  setTimeout(()=>{gameModal.style.display="none";gameIframe.src="";},200);
+  if(document.fullscreenElement)document.exitFullscreen();
+};
+document.addEventListener('keydown',e=>{
+  if(e.key==="Escape"&&gameModal.classList.contains("active")){
+    gameModal.classList.remove("active");
+    setTimeout(()=>{gameModal.style.display="none";gameIframe.src="";},200);
+    if(document.fullscreenElement)document.exitFullscreen();
+  }
+});
+
+// ----- Section Buttons: Apps, Proxies, AI, Chat -----
+function makeSectionBtns(list,containerId){
+  const cont=document.getElementById(containerId);
+  cont.innerHTML="";
+  list.forEach(item=>{
+    const btn=document.createElement("button");
+    btn.className="section-btn";
+    btn.textContent=item.label;
+    btn.onclick=()=>window.open(item.url,"_blank");
+    cont.appendChild(btn);
+  });
+}
+makeSectionBtns([
+  {label:"Replit",url:"https://replit.com"},
+  {label:"Google Docs",url:"https://docs.google.com"},
+  {label:"CodePen",url:"https://codepen.io"}
+],"appsSectionBtns");
+makeSectionBtns([
+  {label:"Ultraviolet",url:"https://the-ultraviolet-project.org/"},
+  {label:"Incognito Proxy",url:"https://proxysite.com/"},
+  {label:"Interstellar",url:"https://interstellar.one/"}
+],"proxiesSectionBtns");
+makeSectionBtns([
+  {label:"AI Code Assistant",url:"https://chat.openai.com"},
+  {label:"Bing AI",url:"https://bing.com/chat"},
+  {label:"Google Gemini",url:"https://gemini.google.com"}
+],"aiSectionBtns");
+makeSectionBtns([
+  {label:"Phoenix Chat",url:"https://discord.com"},
+  {label:"Slack",url:"https://slack.com"},
+  {label:"IRCCloud",url:"https://www.irccloud.com/"}
+],"chatSectionBtns");
+
+// ----- Cloak System -----
+const cloakBar=document.getElementById("cloakBar");
+const cloakLabel=document.getElementById("cloakLabel");
+let currentCloak=prefs.currentCloak||prefs.defaultCloak||"none";
+function applyCloak(type){
+  if(!CLOAKS[type])type="none";
+  currentCloak=type;
+  prefs.currentCloak=type; savePrefs(prefs);
+  const {title, favicon}=CLOAKS[type];
+  document.title=title||"Phoenix";
+  setFavicon(favicon);
+  if(type==="none"||!type){ cloakBar.classList.remove("active"); cloakBar.style.display="none";}
+  else{
+    cloakBar.classList.add("active"); cloakBar.style.display="flex";
+    cloakLabel.textContent="Cloaked as: "+(CLOAKS[type].title||type);
+  }
+}
+function setFavicon(url){
+  document.querySelectorAll('link[rel="icon"]').forEach(e=>e.remove());
+  if(!url)return;
+  const link=document.createElement('link');
+  link.rel="icon"; link.href=url; document.head.appendChild(link);
+}
+document.getElementById('uncloakBtn').onclick=()=>applyCloak("none");
+
+// Quick Settings — accent & cloak only
+document.getElementById("quickSettingsFAB").onclick=()=>{
+  document.getElementById("settingsModal").classList.add("active");
+  document.querySelectorAll('.color-dot').forEach(dot=>{
+    dot.classList.toggle("selected",dot.dataset.color===prefs.accent);
+  });
+  document.getElementById("tabCloakSelect").value=currentCloak;
+};
+document.getElementById("closeModalBtn").onclick=()=>document.getElementById("settingsModal").classList.remove("active");
+window.onclick=e=>{
+  if(e.target===document.getElementById("settingsModal"))document.getElementById("settingsModal").classList.remove("active");
+};
+// Accent color
+document.querySelectorAll('.color-dot').forEach(dot=>{
+  dot.onclick=()=>{
+    document.documentElement.style.setProperty('--outline',dot.dataset.color);
+    document.documentElement.style.setProperty('--accent',dot.dataset.color);
+    prefs.accent=dot.dataset.color; savePrefs(prefs);
+    dot.classList.add("selected");
+    document.querySelectorAll('.color-dot').forEach(d2=>{if(d2!==dot)d2.classList.remove("selected");});
+  };
+});
+
+// Tab cloak (in quick settings)
+document.getElementById("tabCloakSelect").onchange=e=>{
+  applyCloak(e.target.value);
+};
+
+// Goto full settings tab
+document.getElementById("gotoSettingsTab").onclick=()=>{
+  document.getElementById("settingsModal").classList.remove("active");
+  setActiveNavByTab("settings");
+  populateSettingsFields();
+};
+
+// ----- Full Settings Page: Populate, Save, Reset -----
+function populateSettingsFields(){
+  document.getElementById("panicKeyInput").value=prefs.panicKey||"Escape";
+  document.getElementById("panicUrlInput").value=prefs.panicUrl||"https://classroom.google.com";
+  document.getElementById("enableClickoffCloak").checked=!!prefs.clickoffCloak;
+  document.getElementById("fontSelectTab").value=prefs.font;
+  document.getElementById("themeSelectTab").value=prefs.theme;
+  document.getElementById("canvasSelect").value=prefs.sandbox||"default";
+  document.getElementById("animationsToggle").checked=prefs.animations!==false;
+  document.getElementById("tabCloakSelectTab").value=prefs.defaultCloak||"none";
+}
+populateSettingsFields();
+
+document.getElementById("saveSettingsBtn").onclick=function(){
+  prefs.panicKey=document.getElementById("panicKeyInput").value||"Escape";
+  prefs.panicUrl=document.getElementById("panicUrlInput").value||"https://classroom.google.com";
+  prefs.clickoffCloak=document.getElementById("enableClickoffCloak").checked;
+  prefs.font=document.getElementById("fontSelectTab").value;
+  prefs.theme=document.getElementById("themeSelectTab").value;
+  prefs.sandbox=document.getElementById("canvasSelect").value;
+  prefs.animations=document.getElementById("animationsToggle").checked;
+  prefs.defaultCloak=document.getElementById("tabCloakSelectTab").value;
+  savePrefs(prefs);
+  applyTheme(prefs.theme);
+  document.body.style.fontFamily=prefs.font;
+  applyCloak(prefs.defaultCloak);
+  alert("Settings Saved!");
+};
+document.getElementById("resetSettingsBtn").onclick=function(){ if(confirm("Reset all settings?"))resetPrefs(); };
+// ----- Panic Key/Redirect -----
+let panicActive=false;
+document.addEventListener('keydown',e=>{
+  if(document.activeElement.tagName==="INPUT"||document.activeElement.tagName==="TEXTAREA")return;
+  let key=prefs.panicKey||"Escape";
+  if(e.key&&e.key.length===1&&key.length===1&&e.key.toLowerCase()===key.toLowerCase()){
+    if(!panicActive){ panicActive=true; window.location.href=prefs.panicUrl||"https://classroom.google.com"; }
+  }
+  setTimeout(()=>panicActive=false,333);
+});
+// ----- Cloak on Blur -----
+function cloakForBlur(active){
+  if(active){
+    window.addEventListener('blur',()=>applyCloak(currentCloak!=="none"?currentCloak:prefs.defaultCloak));
+    window.addEventListener('focus',()=>applyCloak("none"));
+  }else{
+    window.removeEventListener('blur',()=>applyCloak(currentCloak));
+    window.removeEventListener('focus',()=>applyCloak("none"));
+  }
+}
+cloakForBlur(prefs.clickoffCloak);
+document.getElementById("enableClickoffCloak").onchange=function(e){
+  prefs.clickoffCloak=e.target.checked;
+  savePrefs(prefs);
+  cloakForBlur(prefs.clickoffCloak);
+};
+// ------ Hide/show tabs (future support) -------
+// ------ Games iframe sandbox selector (future-ready) ------
+// ------ Animations (optional; can add CSS toggling) ------
+
+// Init: show home
+showTab("home");
+applyCloak(currentCloak);
+
+// (Optional) If you want cloak to persist even after full reload, ensure you call applyCloak(prefs.defaultCloak) on page load if not none
+
+</script>
+</body>
+</html>
+

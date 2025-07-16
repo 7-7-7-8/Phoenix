@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Phoenix</title>
+<link rel="icon" href="/favicon.ico" />
+
+<style>
+:root {
+  --nav-width: 72px;
+  --nav-width-expanded: 214px;
+  --outline: #ff9100;
+  --outline-hover: #ffaa33;
+  --accent: #ff9100;
+  --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-title: 'Orbitron', 'Segoe UI', Arial, sans-serif;
+  --bg-color: #111;
+  --bg2: #19191d;
+  --text-light: #ddd;
+  --transition: all 0.25s cubic-bezier(0.4, 1.3, 0.6, 1);
+  --nav-label-delay: 0.12s;
+}
+
+body {
+  margin: 0; padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-light);
+  font-family: var(--font-main);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.side-nav {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: var(--nav-width);
+  background: rgba(20, 20, 22, 0.98);
+  box-shadow: 2px 0 24px #0002;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 32px;
+  transition: width 0.25s cubic-bezier(0.4, 1.3, 0.6, 1);
+  z-index: 1000;
+  user-select: none;
+}
+.side-nav:hover,
+.side-nav:focus-within {
+  width: var(--nav-width-expanded);
+  border-right: 2px solid var(--outline);
+}
+
+.nav-icon {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 18px 0 18px 16px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: var(--transition);
+  outline: none;
+}
+
+.nav-icon svg {
+  width: 26px; height: 26px;
+  stroke: var(--outline);
+  fill: none;
+  stroke-width: 2.3;
+  transition: stroke 0.2s;
+  flex-shrink: 0;
+}
+
+.nav-icon.active,
+.nav-icon:hover,
+.nav-icon:focus {
+  background: rgba(255, 145, 0, 0.12);
+  box-shadow: 0 2px 16px #ff910022;
+  border-color: var(--outline);
+}
+
+.nav-icon.active svg,
+.nav-icon:hover svg,
+.nav-icon:focus svg {
+  stroke: var(--outline-hover);
+}
+
+.nav-label {
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  white-space: nowrap;
+  max-width: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.23s, max-width 0.23s;
+  transition-delay: 0s;
+}
+
+.side-nav:hover .nav-label,
+.side-nav:focus-within .nav-label {
+  opacity: 1;
+  max-width: 160px;
+  pointer-events: auto;
+  transition-delay: var(--nav-label-delay);
+}
+
+.main-content {
+  margin-left: var(--nav-width);
+  padding: 24px 7vw 48px 7vw;
+  transition: margin-left 0.25s cubic-bezier(0.4, 1.3, 0.6, 1);
+  min-height: 100vh;
+}
+.side-nav:hover ~ .main-content,
+.side-nav:focus-within ~ .main-content {
+  margin-left: var(--nav-width-expanded);
+}
+
+.phoenix-title {
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 5rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-shadow: 0 2px 24px #ff910033;
+  margin-top: 90px;
+  margin-bottom: 12px;
+  user-select: none;
+  text-align: center;
+}
+
+.changing-text {
+  font-family: var(--font-main);
+  font-size: 1.7rem;
+  color: var(--outline);
+  letter-spacing: 0.06em;
+  height: 2.2rem;
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+  text-align: center;
+}
+
+.changing-text span {
+  position: absolute;
+  width: 100%;
+  opacity: 0;
+  animation: fadeScroll 12s linear infinite;
+}
+
+.changing-text span:nth-child(1) { animation-delay: 0s; }
+.changing-text span:nth-child(2) { animation-delay: 4s; }
+.changing-text span:nth-child(3) { animation-delay: 8s; }
+
+@keyframes fadeScroll {
+  0% { opacity: 0; transform: translateY(30%); }
+  10% { opacity: 1; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(0); }
+  40% { opacity: 0; transform: translateY(-30%); }
+  100% { opacity: 0; transform: translateY(-30%); }
+}
+
+/* Game modal overlay */
+#gameModal {
+  display: none;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
+  width: 90vw;
+  max-width: 900px;
+  height: 70vh;
+  background: #141418;
+  border-radius: 18px;
+  box-shadow: 0 0 40px #ff910033;
+  overflow: hidden;
+  flex-direction: column;
+  display: flex;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+#gameModal.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Close button inside modal */
+#gameModal .close-btn {
+  position: absolute;
+  top: 10px; right: 12px;
+  font-size: 2.5rem;
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 900;
+  line-height: 1;
+  user-select: none;
+  transition: color 0.3s;
+  z-index: 2100;
+}
+#gameModal .close-btn:hover {
+  color: var(--outline-hover);
+}
+
+/* Game iframe */
+#gameIframe {
+  flex-grow: 1;
+  border: none;
+  border-radius: 0 0 18px 18px;
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 32px #ff910022;
+}
+
+/* Modal controls below iframe */
+.modal-controls {
+  display: flex;
+  gap: 12px;
+  padding: 12px 18px;
+  background: #1e1e1e;
+  border-top: 2px solid var(--outline);
+  border-radius: 0 0 18px 18px;
+  user-select: none;
+}
+
+.control-btn {
+  background: var(--outline);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  color: #121212;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.control-btn:hover,
+.control-btn:focus {
+  background: var(--outline-hover);
+  box-shadow: 0 0 8px var(--outline-hover);
+  outline: none;
+}
+
+/* Quick Settings FAB */
+.quick-settings-btn {
+  position: fixed;
+  bottom: 36px;
+  right: 36px;
+  background: var(--bg2);
+  border: 2.5px solid var(--outline);
+  border-radius: 50%;
+  width: 58px;
+  height: 58px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 2500;
+  box-shadow: 0 2px 24px #0008;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.quick-settings-btn:hover,
+.quick-settings-btn:focus {
+  border-color: var(--outline-hover);
+  box-shadow: 0 2px 24px #ff910044;
+  outline: none;
+}
+.quick-settings-btn svg {
+  stroke: var(--outline);
+  width: 34px;
+  height: 34px;
+  stroke-width: 2.7;
+  fill: none;
+  transition: stroke 0.2s;
+}
+.quick-settings-btn:hover svg,
+.quick-settings-btn:focus svg {
+  stroke: var(--outline-hover);
+}
+
+/* Settings modal */
+.modal {
+  position: fixed;
+  z-index: 3000;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(24, 25, 26, 0.92);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+}
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: #222324;
+  border: 2.5px solid var(--outline);
+  border-radius: 18px;
+  padding: 32px 40px;
+  color: var(--text-light);
+  min-width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 8px 40px #000a;
+  position: relative;
+  font-family: var(--font-main);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 18px;
+  font-size: 2rem;
+  color: var(--accent);
+  cursor: pointer;
+  background: none;
+  border: none;
+  line-height: 1;
+}
+
+.color-picker {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.color-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--outline);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.color-dot.selected,
+.color-dot:hover {
+  border-color: var(--accent);
+}
+
+/* Cloak bar */
+.cloak-bar {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: #232526;
+  color: #fff;
+  padding: 8px 24px;
+  font-size: 1rem;
+  z-index: 1000;
+  border-bottom: 2px solid var(--outline);
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.2s;
+  user-select: none;
+}
+.cloak-bar.active {
+  display: flex;
+}
+.cloak-bar button {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 12px;
+  user-select: none;
+}
+
+/* Tab Cards (used on Home page if you want to add but not included now) */
+.tab-card {
+  background: var(--bg2);
+  border: 2px solid var(--outline);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 0 16px #ff910033;
+  color: var(--accent);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+}
+.tab-card:hover,
+.tab-card:focus {
+  background: var(--outline);
+  box-shadow: 0 0 24px var(--outline-hover);
+  outline: none;
+  transform: translateY(-4px);
+}
+.tab-card h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 1.6rem;
+}
+.tab-card p {
+  margin: 0;
+  font-weight: 500;
+  color: var(--text-light);
+}
+.settings-group {
+  margin-bottom: 1.25rem;
+}
+.settings-group label {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+.settings-group input[type="text"],
+.settings-group input[type="color"],
+.settings-group select {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #181818;
+  color: white;
+  width: 100%;
+  max-width: 400px;
+}
+.settings-group small {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .side-nav {
+    width: var(--nav-width);
+  }
+  .side-nav:hover,
+  .side-nav:focus-within {
+    width: var(--nav-width-expanded);
+  }
+  .main-content {
+    margin-left: var(--nav-width);
+    padding: 24px 2vw 48px 2vw;
+  }
+  .phoenix-title {
+    font-size: 3.2rem;
+  }
+  .modal-content {
+    padding: 16px 8px;
+    min-width: 0;
+  }
+}
+</style>
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+<div class="side-nav">
+  <div class="nav-icon active" data-tab="home" onclick="setActiveNav(this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 12L12 5l9 7v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg>
+    <span class="nav-label">Home</span>
+  </div>
+  <div class="nav-icon" data-tab="games" onclick="setActiveNav(this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 16a3 3 0 01-3-3v0a3 3 0 013-3h6a3 3 0 010 6H6zM17.5 9.5L17.51 9.5" /></svg>
+    <span class="nav-label">Games</span>
+  </div>
+  <div class="nav-icon" data-tab="apps" onclick="setActiveNav(this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" /></svg>
+    <span class="nav-label">Apps</span>
+  </div>
+  <div class="nav-icon" data-tab="proxies" onclick="setActiveNav(this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h16v2H4zM4 10h16v2H4zM4 16h16v2H4z" /></svg>
+    <span class="nav-label">Proxies</span>
+  </div>
+  <div class="nav-icon" data-tab="ai" onclick="setActiveNav(this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.8 1.8 0 0 0 .1-3.3c-.2-.5-.3-1-.5-1.5a1.8 1.8 0 0 0-.2-3.2 7.5 7.5 0 0 0-3.8-2.4 1.7 1.7 0 0 0-3-1A7.5 7.5 0 0 0 5 7a1.7 1.7 0 0 0-1 3c-.1.5-.3 1-.3 1.5a1.7 1.7 0 0 0 .2 2.8 7.5 7.5 0 0 0 3.8 2.4 1.7 1.7 0 0 0 3 1c.5.1 1 .2 1.5.2a1.7 1.7 0 0 0 2.7-.6 7.5 7.5 0 0 0 3.5-3.3z"/></svg>
+    <span class="nav-label">AI</span>
+  </div>
+  <div class="nav-icon" data-tab="chat" onclick="setActiveNav(this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 21v-5a9 9 0 019-9h6a6 6 0 010 12h-6a3 3 0 00-3 3z"/></svg>
+    <span class="nav-label">Chat</span>
+  </div>
+  <div class="nav-icon" data-tab="contact" onclick="setActiveNav(this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 5h18M3 5l9 9 9-9M5 19h14a2 2 0 002-2V8l-9 9-9-9v9a2 2 0 002 2z"/></svg>
+    <span class="nav-label">Contact</span>
+  </div>
+  <div class="nav-icon" data-tab="settings" onclick="setActiveNav(this)">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5zM19.4 15a1.7 1.7 0 1 0 .9-3.3 7.4 7.4 0 0 0-.3-1.6 1.7 1.7 0 0 0 .2-2.8A7.5 7.5 0 0 0 17 5.2a1.7 1.7 0 0 0-3-1 7.5 7.5 0 0 0-1.6-.3 1.7 1.7 0 0 0-2.8.2A7.5 7.5 0 0 0 5.2 7a1.7 1.7 0 0 0-1 3 7.5 7.5 0 0 0-.3 1.6 1.7 1.7 0 0 0 .2 2.8A7.5 7.5 0 0 0 7 18.8a1.7 1.7 0 0 0 3 1 7.5 7.5 0 0 0 1.6.3 1.7 1.7 0 0 0 2.8-.2 7.5 7.5 0 0 0 5-3.9z"/></svg>
+    <span class="nav-label">Settings</span>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Phoenix Header on Home -->
+  <h1 class="phoenix-title" id="pageTitle">PHOENIX</h1>
+  <div class="changing-text">
+    <span>Innovate.</span>
+    <span>Empower.</span>
+    <span>Transform.</span>
+  </div>
+
+  <!-- Content Tabs -->
+  <div id="homeContent" style="margin-top:60px;"></div>
+  <div id="gamesContent" style="display:none;"></div>
+  <div id="appsContent" style="display:none;"></div>
+  <div id="proxiesContent" style="display:none;"></div>
+  <div id="aiContent" style="display:none;"></div>
+  <div id="chatContent" style="display:none;"></div>
+  <div id="contactContent" style="display:none;"></div>
+  <div id="settingsContent" style="display:none;">
+    <!-- Settings Tab Content -->
+<div id="settingsPanel" class="settings-panel">
+  <h2 style="font-size:2rem;color:var(--accent);margin-bottom:1.2rem;">Settings</h2>
+
+  <div class="settings-group">
+    <label for="panicKeyInput"><strong>Panic Key:</strong></label>
+    <input type="text" id="panicKeyInput" maxlength="1" placeholder="e.g. P" />
+    <small>This key will redirect you immediately when pressed.</small>
+  </div>
+
+  <div class="settings-group">
+    <label for="panicUrlInput"><strong>Panic Redirect URL:</strong></label>
+    <input type="text" id="panicUrlInput" placeholder="e.g. https://classroom.google.com" />
+    <small>This is the page you'll get redirected to when the key is pressed.</small>
+  </div>
+
+  <div class="settings-group">
+    <label>
+      <input type="checkbox" id="enableClickoffCloak" />
+      <strong>Auto-Cloak when tab loses focus</strong>
+    </label>
+    <small>Enable this to automatically cloak when clicking away from the tab.</small>
+  </div>
+
+  <div class="settings-group">
+    <label for="fontSelectTab"><strong>Font:</strong></label>
+    <select id="fontSelectTab">
+      <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI</option>
+      <option value="'Orbitron', Arial, sans-serif">Orbitron</option>
+      <option value="'Roboto', Arial, sans-serif">Roboto</option>
+      <option value="'Ubuntu', Arial, sans-serif">Ubuntu</option>
+    </select>
+  </div>
+
+  <div class="settings-group">
+    <label for="accentColorInput"><strong>Accent Color:</strong></label>
+    <input type="color" id="accentColorInput" value="#ff9100" />
+    <small>Changes outline, buttons, and titles across site.</small>
+  </div>
+
+  <div class="settings-group">
+    <label for="themeSelectTab"><strong>Background Theme:</strong></label>
+    <select id="themeSelectTab">
+      <option value="dark">Dark</option>
+      <option value="dim">Dim</option>
+      <option value="solarized">Solarized</option>
+      <option value="glass">Glass</option>
+    </select>
+  </div>
+
+  <button id="saveSettingsBtn" class="control-btn" style="margin-top: 16px;">💾 Save Settings</button>
+</div>
+
+  </div>
+</div>
+<!-- Game Modal Overlay -->
+<div id="gameModal">
+  <button class="close-btn" id="closeGameModal" aria-label="Close Game Modal">&times;</button>
+  <iframe id="gameIframe"
+    title="Game window"
+    allowfullscreen
+    sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock"
+    style="flex:1 1 auto; min-height:340px; width:100%; border-radius:0 0 16px 16px;"></iframe>
+  <div class="modal-controls">
+    <button id="fullscreenBtn" class="control-btn" title="Fullscreen this game">Fullscreen</button>
+    <button id="aboutBlankBtn" class="control-btn" title="Open in about:blank window">About:Blank</button>
+    <button id="downloadBtn" class="control-btn" title="Download this game as HTML">Download</button>
+  </div>
+</div>
+<!-- Cloak Bar for Stealth -->
+<div id="cloakBar" class="cloak-bar">
+  <span id="cloakLabel"></span>
+  <button id="uncloakBtn">Uncloak</button>
+</div>
+<!-- Quick Settings FAB Button -->
+<button class="quick-settings-btn" id="quickSettingsFAB" title="Quick Settings">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.8 1.8 0 0 0 .1-3.3c-.2-.5-.3-1-.5-1.5a1.8 1.8 0 0 0-.2-3.2 7.5 7.5 0 0 0-3.8-2.4 1.7 1.7 0 0 0-3-1A7.5 7.5 0 0 0 5 7a1.7 1.7 0 0 0-1 3c-.1.5-.3 1-.3 1.5a1.7 1.7 0 0 0 .2 2.8 7.5 7.5 0 0 0 3.8 2.4 1.7 1.7 0 0 0 3 1c.5.1 1 .2 1.5.2a1.7 1.7 0 0 0 2.7-.6 7.5 7.5 0 0 0 3.5-3.3z"/></svg>
+</button>
+<!-- Quick Settings Modal -->
+<div id="settingsModal" class="modal" tabindex="-1">
+  <div class="modal-content">
+    <button id="closeModalBtn" class="close-modal" aria-label="Close Settings">&times;</button>
+    <h2 style="color:var(--accent);margin-top:0;">Quick Settings</h2>
+    <div style="margin-bottom:1.2rem;">
+      <div style="font-weight:bold; margin-bottom:0.8rem;">Outline / Accent Color:</div>
+      <div class="color-picker">
+        <span class="color-dot" data-color="#ff9100" style="background:#ff9100;"></span>
+        <span class="color-dot" data-color="#00ffd0" style="background:#00ffd0;"></span>
+        <span class="color-dot" data-color="#82b1ff" style="background:#82b1ff;"></span>
+        <span class="color-dot" data-color="#e040fb" style="background:#e040fb;"></span>
+        <span class="color-dot" data-color="#ffee00" style="background:#ffee00;"></span>
+      </div>
+    </div>
+    <div style="margin-bottom:1rem;">
+      <div style="font-weight:bold; margin-bottom:0.3rem;">Font:</div>
+      <select id="fontSelect" style="padding:7px 16px; border-radius:6px;">
+        <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI</option>
+        <option value="'Orbitron', Arial, sans-serif">Orbitron</option>
+        <option value="'Roboto', Arial, sans-serif">Roboto</option>
+        <option value="'Ubuntu', Arial, sans-serif">Ubuntu</option>
+      </select>
+    </div>
+    <div style="margin-bottom:1rem;">
+      <div style="font-weight:bold; margin-bottom:.3rem;">Theme:</div>
+      <select id="themeSelect" style="padding:7px 16px; border-radius:6px;">
+        <option value="dark">Dark</option>
+        <option value="dim">Dim</option>
+        <option value="solarized">Solarized</option>
+        <option value="glass">Glass</option>
+      </select>
+    </div>
+    <div style="margin-bottom:1rem;">
+      <div style="font-weight:bold; margin-bottom:.3rem;">Cloak on Tab Blur:</div>
+      <label><input type="checkbox" id="clickoffCloakToggle"/> Enable</label>
+    </div>
+    <div>
+      <button id="gotoSettingsTab" class="control-btn" style="margin-top:8px;">Full Settings Page</button>
+    </div>
+  </div>
+</div>
+  <script>
+/* ----------- BEGIN SETTINGS LOAD/SAVE ----------- */
+function savePrefs(prefs) {
+  localStorage.setItem('phoenix-prefs', JSON.stringify(prefs));
+}
+function loadPrefs() {
+  return JSON.parse(localStorage.getItem('phoenix-prefs') || '{}');
+}
+
+/* ----------- LOAD PREFS AND APPLY ON STARTUP ----------- */
+const defaultPrefs = {
+  accent: "#ff9100",
+  font: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+  theme: "dark",
+  panicKey: "Escape",
+  panicUrl: "https://classroom.google.com",
+  clickoffCloak: false
+};
+let prefs = { ...defaultPrefs, ...loadPrefs() };
+
+// Apply accent/font/theme at startup
+document.documentElement.style.setProperty('--outline', prefs.accent);
+document.documentElement.style.setProperty('--accent', prefs.accent);
+document.body.style.fontFamily = prefs.font;
+
+function applyTheme(theme) {
+  switch (theme) {
+    case "dim":
+      document.documentElement.style.setProperty('--bg-color', '#15151b');
+      document.documentElement.style.setProperty('--bg2', '#1b1b22');
+      break;
+    case "solarized":
+      document.documentElement.style.setProperty('--bg-color', '#002b36');
+      document.documentElement.style.setProperty('--bg2', '#073642');
+      break;
+    case "glass":
+      document.documentElement.style.setProperty('--bg-color', 'rgba(20,20,30,0.75)');
+      document.documentElement.style.setProperty('--bg2', 'rgba(35,35,55,0.55)');
+      break;
+    default: // "dark"
+      document.documentElement.style.setProperty('--bg-color', '#111');
+      document.documentElement.style.setProperty('--bg2', '#19191d');
+  }
+}
+applyTheme(prefs.theme);
+
+/* ----------- SIDEBAR NAVIGATION & TAB HANDLING ----------- */
+function showTab(tab) {
+  document.querySelectorAll('.nav-icon').forEach(i => {
+    i.classList.toggle('active', i.dataset.tab === tab);
+  });
+  document.getElementById('pageTitle').textContent = (tab === 'home') ? 'PHOENIX' : tab.toUpperCase();
+  document.querySelector('.changing-text').style.display = (tab === 'home') ? 'block' : 'none';
+
+  // Hide/show tab pages
+  ['homeContent','gamesContent','appsContent','proxiesContent','aiContent','chatContent','contactContent','settingsContent'].forEach(id => {
+    document.getElementById(id).style.display = (id.toLowerCase() === tab+'content') || (tab==='home'&&id==='homeContent') ? 'block':'none';
+  });
+}
+function setActiveNav(el) {
+  const tab = el.dataset.tab;
+  showTab(tab);
+
+  // If settings, scroll or focus into view
+  if (tab === 'settings') {
+    document.getElementById('settingsContent').scrollIntoView({behavior: "smooth"});
+    populateSettingsFields();
+  }
+}
+/* Enable programmatic tab switch */
+function setActiveNavByTab(tab) {
+  document.querySelectorAll('.nav-icon').forEach(icon => {
+    if (icon.dataset.tab === tab) icon.click();
+  });
+}
+
+/* ----------- GAME MODAL LOGIC ----------- */
+let currentGame = null;
+const games = [
+  {name:"Bob The Robber 4", url:"https://7-7-7-8.github.io/BobTheRobber4/", download:"https://7-7-7-8.github.io/BobTheRobber4/"},
+  {name:"2048 Fusion", url:"https://ucbg.github.io/2048-fusion/", download:"https://ucbg.github.io/2048-fusion/"}
+  // Add more games here
+];
+const gameModal = document.getElementById("gameModal");
+const gameIframe = document.getElementById("gameIframe");
+
+function populateGameButtons() {
+  const btns = document.createDocumentFragment();
+  games.forEach(game => {
+    const btn = document.createElement("button");
+    btn.textContent = game.name;
+    btn.className = "control-btn";
+    btn.onclick = () => openGameModal(game);
+    btns.appendChild(btn);
+  });
+  const gc = document.getElementById("gamesContent");
+  gc.innerHTML = '<h2 style="color: var(--accent);">Games</h2>';
+  const div = document.createElement('div');
+  div.style.marginTop = "24px";
+  div.append(...btns.childNodes);
+  gc.append(div);
+}
+if (document.getElementById("gamesContent")) populateGameButtons();
+
+function openGameModal(game) {
+  currentGame = game;
+  gameIframe.src = game.url;
+  gameModal.classList.add("active");
+  gameModal.style.display = "flex";
+  setTimeout(() => gameModal.classList.add("active"), 10);
+
+  document.getElementById("fullscreenBtn").onclick = () => {
+    if (gameIframe.requestFullscreen) gameIframe.requestFullscreen();
+    else if (gameIframe.webkitRequestFullscreen) gameIframe.webkitRequestFullscreen();
+    else if (gameIframe.msRequestFullscreen) gameIframe.msRequestFullscreen();
+  };
+  document.getElementById("aboutBlankBtn").onclick = () => {
+    const html = `
+      <html>
+      <head><title>${currentGame.name}</title></head>
+      <body style="margin:0;background:#000;">
+      <iframe src="${currentGame.url}" frameborder="0" style="width:100vw;height:100vh;border:none;" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+      </body>
+      </html>
+    `.trim();
+    const win = window.open();
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+  };
+  document.getElementById("downloadBtn").onclick = () => {
+    const blob = new Blob([`
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>${currentGame.name}</title><style>
+html,body{margin:0;height:100%;background:#000;}iframe{border:none;width:100vw;height:100vh;}
+</style></head><body>
+<iframe src="${currentGame.url}" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+</body></html>
+    `], {type:"text/html"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${currentGame.name.replace(/\s+/g,"_").toLowerCase()}.html`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+}
+document.getElementById("closeGameModal").onclick = () => {
+  gameModal.classList.remove("active");
+  setTimeout(()=>{ gameModal.style.display="none"; gameIframe.src = ""; }, 200);
+  if (document.fullscreenElement) document.exitFullscreen();
+};
+
+/* Hide modal on ESC */
+document.addEventListener('keydown', e => {
+  if (e.key === "Escape" && gameModal.classList.contains("active")) {
+    gameModal.classList.remove("active");
+    setTimeout(()=>{ gameModal.style.display="none"; gameIframe.src = ""; }, 200);
+    if (document.fullscreenElement) document.exitFullscreen();
+  }
+});
+
+/* ----------- CLOAK BAR & CLICK-OFF CLOAK ----------- */
+const cloakBar = document.getElementById('cloakBar');
+const cloakLabel = document.getElementById('cloakLabel');
+function applyCloak(type) {
+  if (type === 'none' || !type) {
+    cloakBar.classList.remove('active');
+    cloakBar.style.display = 'none';
+    document.title = 'Phoenix';
+    setFavicon('default');
+    return;
+  }
+  cloakBar.classList.add('active');
+  cloakBar.style.display = 'flex';
+  let label = '', title = '', favicon = '';
+  switch(type) {
+    case 'classroom':
+      label = 'Google Classroom'; title = 'Classes';
+      favicon = 'https://ssl.gstatic.com/classroom/ic_product_classroom_32.png'; break;
+    case 'docs':
+      label = 'Google Docs'; title = 'Untitled document - Google Docs';
+      favicon = 'https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico'; break;
+    case 'drive':
+      label = 'Google Drive'; title = 'My Drive - Google Drive';
+      favicon = 'https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png'; break;
+    case 'youtube':
+      label = 'YouTube'; title = 'YouTube';
+      favicon = 'https://www.youtube.com/s/desktop/6e6e5d1b/img/favicon_32x32.png'; break;
+    default:
+      label = 'Cloaked Tab'; title = 'Loading...'; favicon = '';
+  }
+  cloakLabel.textContent = `Cloaked as: ${label}`;
+  document.title = title;
+  setFavicon(favicon);
+}
+function setFavicon(url) {
+  document.querySelectorAll('link[rel="icon"]').forEach(e => e.remove());
+  if (url === 'default') return;
+  const link = document.createElement('link');
+  link.rel = 'icon'; link.href = url; document.head.appendChild(link);
+}
+
+/* Uncloak on click */
+document.getElementById('uncloakBtn').onclick = () => {
+  applyCloak('none');
+  document.getElementById('cloakSelect').value = 'none';
+};
+let currentCloak = "none";
+
+/* Click-off cloaking logic */
+let clickoffCloakEnabled = prefs.clickoffCloak;
+function handleTabFocusCloak() {
+  if (clickoffCloakEnabled && currentCloak !== 'none') {
+    window.addEventListener('blur', ()=>applyCloak(currentCloak));
+    window.addEventListener('focus', ()=>applyCloak('none'));
+  } else {
+    window.removeEventListener('blur', ()=>applyCloak(currentCloak));
+    window.removeEventListener('focus', ()=>applyCloak('none'));
+    applyCloak('none');
+  }
+}
+handleTabFocusCloak();
+
+/* ----------- PANIC KEY (user-defined) ----------- */
+let panicKey = prefs.panicKey || "Escape";
+let panicUrl = prefs.panicUrl || "https://classroom.google.com";
+document.addEventListener('keydown', e => {
+  if (e.key && e.key.toLowerCase() === panicKey.toLowerCase() && document.activeElement.tagName !== "INPUT") {
+    window.location.href = panicUrl;
+  }
+});
+
+/* ----------- QUICK SETTINGS FAB ----------- */
+const settingsModal = document.getElementById('settingsModal');
+document.getElementById('quickSettingsFAB').onclick = () => {
+  settingsModal.classList.add('active');
+  document.getElementById('fontSelect').value = prefs.font;
+  document.getElementById('themeSelect').value = prefs.theme;
+  document.getElementById('clickoffCloakToggle').checked = !!prefs.clickoffCloak;
+};
+document.getElementById('closeModalBtn').onclick = () => settingsModal.classList.remove('active');
+window.onclick = e => { if (e.target === settingsModal) settingsModal.classList.remove('active'); };
+
+/* ----- Quick settings controls (in modal) ----- */
+document.querySelectorAll('.color-dot').forEach(dot => {
+  dot.onclick = () => {
+    const color = dot.dataset.color;
+    document.documentElement.style.setProperty('--outline', color);
+    document.documentElement.style.setProperty('--accent', color);
+    prefs.accent = color;
+    savePrefs(prefs);
+  };
+});
+document.getElementById('fontSelect').onchange = e => {
+  const font = e.target.value;
+  document.body.style.fontFamily = font;
+  prefs.font = font;
+  savePrefs(prefs);
+};
+document.getElementById('themeSelect').onchange = e => {
+  const theme = e.target.value;
+  prefs.theme = theme;
+  savePrefs(prefs);
+  applyTheme(theme);
+};
+document.getElementById('clickoffCloakToggle').onchange = e => {
+  prefs.clickoffCloak = e.target.checked;
+  clickoffCloakEnabled = !!prefs.clickoffCloak;
+  savePrefs(prefs);
+  handleTabFocusCloak();
+};
+
+/* "Full Settings Page" button (from modal) */
+document.getElementById('gotoSettingsTab').onclick = () => {
+  settingsModal.classList.remove('active');
+  setActiveNavByTab('settings');
+  populateSettingsFields();
+};
+
+/* ----------- SETTINGS TAB LOGIC AND FIELDS ----------- */
+function populateSettingsFields() {
+  document.getElementById('panicKeyInput').value = prefs.panicKey || "Escape";
+  document.getElementById('panicUrlInput').value = prefs.panicUrl || "https://classroom.google.com";
+  document.getElementById('enableClickoffCloak').checked = !!prefs.clickoffCloak;
+  document.getElementById('fontSelectTab').value = prefs.font;
+  document.getElementById('accentColorInput').value = prefs.accent;
+  document.getElementById('themeSelectTab').value = prefs.theme;
+}
+if (document.getElementById('settingsContent')) populateSettingsFields();
+
+document.getElementById('saveSettingsBtn').onclick = function() {
+  prefs.panicKey = document.getElementById('panicKeyInput').value || "Escape";
+  prefs.panicUrl = document.getElementById('panicUrlInput').value || "https://classroom.google.com";
+  prefs.clickoffCloak = document.getElementById('enableClickoffCloak').checked;
+  prefs.font = document.getElementById('fontSelectTab').value;
+  prefs.accent = document.getElementById('accentColorInput').value;
+  prefs.theme = document.getElementById('themeSelectTab').value;
+  savePrefs(prefs);
+
+  // Apply all new settings instantly
+  document.body.style.fontFamily = prefs.font;
+  document.documentElement.style.setProperty('--outline', prefs.accent);
+  document.documentElement.style.setProperty('--accent', prefs.accent);
+  applyTheme(prefs.theme);
+  clickoffCloakEnabled = !!prefs.clickoffCloak;
+  panicKey = prefs.panicKey;
+  panicUrl = prefs.panicUrl;
+  handleTabFocusCloak();
+  alert("Settings Saved!");
+};
+
+/* ----------- INIT: Show Home Tab by Default ----------- */
+showTab('home');
+</script>
+</body>
+</html>
+
+

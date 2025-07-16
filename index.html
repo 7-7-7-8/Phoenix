@@ -599,6 +599,7 @@
    
 
 <script>
+  let currentGame = null;
   // Your games list — replace URLs with your actual game URLs and download links
   const games = [
     { name: "Bob The Robber 4", url: "https://7-7-7-8.github.io/BobTheRobber4/", download: "https://7-7-7-8.github.io/BobTheRobber4/" },
@@ -638,6 +639,7 @@
 
   // Open modal and load game iframe
   function openGameModal(game) {
+    currentGame = game; // ✅ ADD this
     gameIframe.src = game.url;
     gameModal.classList.add('active');
 

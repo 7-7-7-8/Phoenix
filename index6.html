@@ -251,22 +251,24 @@ body {
   box-shadow: 0 3px 12px var(--outline-hover);
   outline: none;
 }
-  <head>
-  <!-- your other head elements here -->
-  <style>
-    /* Existing styles... */
-    
- #gameModal {
-  display:none; /* keep default hidden */
+ /* Modal overlay */
+#gameModal {
+  display: none; /* hidden by default */
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.9);
   z-index: 10500;
-  display: flex;
   align-items: center;
   justify-content: center;
 }
-#gameModal.popup-inner {
+
+/* Show modal */
+#gameModal.show {
+  display: flex;
+}
+
+/* Inner modal content box */
+#gameModal .modal-content {
   background: #262626;
   border: 2px solid orange;
   border-radius: 12px;
@@ -274,13 +276,17 @@ body {
   box-shadow: 0 0 12px #000;
   color: #ddd;
   width: 360px;
+  max-height: 90vh;
+  overflow-y: auto;
   text-align: center;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-#gameModal .close-btn {
+
+/* Close button */
+#gameModal .modal-content .close-btn {
   position: absolute;
   top: 18px;
   right: 20px;
@@ -288,12 +294,26 @@ body {
   font-size: 28px;
   font-weight: bold;
   cursor: pointer;
+  background: none;
+  border: none;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.2s ease;
 }
-#gameModal.loading-logo {
+#gameModal .modal-content .close-btn:hover,
+#gameModal .modal-content .close-btn:focus {
+  color: #ff8c00;
+  outline: none;
+}
+
+/* Loading logo */
+#gameModal .modal-content .loading-logo {
   width: 72px;
   margin-bottom: 20px;
 }
-#gameModal.loading-bar-bg {
+
+/* Loading bar background */
+#gameModal .modal-content .loading-bar-bg {
   width: 240px;
   height: 20px;
   background: #444;
@@ -301,19 +321,34 @@ body {
   overflow: hidden;
   margin: 16px auto 4px;
 }
-#gameModal .loading-bar-fg {
+
+/* Loading bar foreground */
+#gameModal .modal-content .loading-bar-fg {
   height: 100%;
   background: #3576e1;
   width: 59%; /* example starting width */
   transition: width 0.3s;
 }
-#gameModal .loading-percentage {
+
+/* Loading percentage text */
+#gameModal .modal-content .loading-percentage {
   color: #ddd;
   font-weight: 600;
   font-size: 18px;
   margin-bottom: 24px;
 }
-#gameModal .popup-actions button {
+
+/* Popup actions container */
+#gameModal .modal-content .popup-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+/* Popup action buttons */
+#gameModal .modal-content .popup-actions button,
+#gameModal .modal-content .control-btn {
   background: orange;
   color: black;
   border: none;
@@ -322,13 +357,59 @@ body {
   border-radius: 6px;
   font-size: 15px;
   cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
 }
-#gameModal .popup-actions {
+#gameModal .modal-content .popup-actions button:hover,
+#gameModal .modal-content .control-btn:hover,
+#gameModal .modal-content .popup-actions button:focus,
+#gameModal .modal-content .control-btn:focus {
+  background: #cc8400;
+  outline: none;
+}
+
+/* iframe styling inside modal */
+#gameModal .modal-content iframe#gameIframe {
+  flex: 1 1 auto;
+  border: none;
+  min-height: 340px;
+  width: 100%;
+  border-radius: 0 0 16px 16px;
+  background: #000;
+}
+
+/* Modal controls area */
+#gameModal .modal-controls {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  padding: 0.75em 1em;
+  background: #2c2f38;
+  gap: 1em;
+  flex-wrap: wrap;
   margin-top: 16px;
 }
+
+/* Modal control buttons */
+#gameModal .modal-controls .control-btn {
+  background: orange;
+  color: black;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+#gameModal .modal-controls .control-btn:hover,
+#gameModal .modal-controls .control-btn:focus {
+  background: #cc8400;
+  outline: none;
+}
+
+    /* Existing styles... */
+    
+
 
 
    
@@ -581,20 +662,23 @@ body {
   </div>
 </div>
   <!-- Game Modal Overlay -->
-<div id="gameModal">
-  
-  <button class="close-btn" id="closeGameModal" aria-label="Close Game Modal">&times;</button>
-  <iframe id="gameIframe"
-    title="Game window"
-    allowfullscreen
-    sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock"
-    style="flex:1 1 auto; min-height:340px; width:100%; border-radius:0 0 16px 16px;"></iframe>
-  <div class="modal-controls">
-    <button id="fullscreenBtn" class="control-btn" title="Fullscreen this game">Fullscreen</button>
-    <button id="aboutBlankBtn" class="control-btn" title="Open in about:blank window">About:Blank</button>
-    <button id="downloadBtn" class="control-btn" title="Download this game as HTML">Download</button>
+<div id="gameModal" role="dialog" aria-modal="true" aria-labelledby="gameModalTitle" tabindex="-1">
+  <div class="modal-content">
+    <button class="close-btn" id="closeGameModal" aria-label="Close Game Modal">&times;</button>
+    <iframe id="gameIframe"
+      title="Game window"
+      allowfullscreen
+      sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock"
+      style="flex:1 1 auto; min-height:340px; width:100%; border-radius: 0 0 16px 16px;">
+    </iframe>
+    <div class="modal-controls">
+      <button id="fullscreenBtn" class="control-btn" title="Fullscreen this game">Fullscreen</button>
+      <button id="aboutBlankBtn" class="control-btn" title="Open in about:blank window">About:Blank</button>
+      <button id="downloadBtn" class="control-btn" title="Download this game as HTML">Download</button>
+    </div>
   </div>
 </div>
+
  
 
 
@@ -829,70 +913,119 @@ function setActiveNavByTab(tab) {
     if(icon.dataset.tab===tab) icon.click();
   });
 }
-// ----- Game Modal Logic -----
+
+  //----------------------populate gameModel----------------------------------
 const games = [
-  {name:"Bob The Robber 4",url:"https://7-7-7-8.github.io/BobTheRobber4/"},
-  {name:"2048 Fusion",url:"https://ucbg.github.io/2048-fusion/"}
+  {name: "Bob The Robber 4", url: "https://7-7-7-8.github.io/BobTheRobber4/"},
+  {name: "2048 Fusion", url: "https://ucbg.github.io/2048-fusion/"}
 ];
-function populateGameButtons(){
-  const gc=document.getElementById("gamesContent");
-  gc.innerHTML='<h2 style="color:var(--accent);">Games</h2><div class="game-btns-list" id="gameBtns"></div>';
-  const list=document.getElementById("gameBtns");
-  games.forEach(game=>{
-    const btn=document.createElement("button");
-    btn.textContent=game.name;
-    btn.className="game-btn"; // <- updated class here
-    btn.onclick=()=>openGameModal(game);
+
+function populateGameButtons() {
+  const gc = document.getElementById("gamesContent");
+  gc.innerHTML = `
+    <h2 style="color: var(--accent);">Games</h2>
+    <div class="game-btns-list" id="gameBtns"></div>
+  `;
+  const list = document.getElementById("gameBtns");
+  games.forEach(game => {
+    const btn = document.createElement("button");
+    btn.textContent = game.name;
+    btn.className = "game-btn";
+    btn.onclick = () => openGameModal(game);
     list.appendChild(btn);
   });
 }
 populateGameButtons();
-const gameModal=document.getElementById("gameModal");
-const gameIframe=document.getElementById("gameIframe");
-function openGameModal(game){
-  gameIframe.src=game.url;
-  gameModal.classList.add("active"); gameModal.style.display="flex";
-  document.getElementById("fullscreenBtn").onclick=()=>{
-    if(gameIframe.requestFullscreen)gameIframe.requestFullscreen();
+
+const gameModal = document.getElementById("gameModal");
+const gameIframe = document.getElementById("gameIframe");
+
+function openGameModal(game) {
+  gameIframe.src = game.url;
+
+  // Show the modal by adding a 'show' class and let CSS handle display:flex
+  gameModal.classList.add("show");
+
+  // Fullscreen button functionality
+  document.getElementById("fullscreenBtn").onclick = () => {
+    if (gameIframe.requestFullscreen) {
+      gameIframe.requestFullscreen();
+    } else if (gameIframe.webkitRequestFullscreen) { /* Safari */
+      gameIframe.webkitRequestFullscreen();
+    } else if (gameIframe.msRequestFullscreen) { /* IE11 */
+      gameIframe.msRequestFullscreen();
+    }
   };
-  document.getElementById("aboutBlankBtn").onclick=()=>{
-    const html=`
-      <html>
+
+  // Open in about:blank window button
+  document.getElementById("aboutBlankBtn").onclick = () => {
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
       <head><title>${game.name}</title></head>
       <body style="margin:0;background:#000;">
-      <iframe src="${game.url}" frameborder="0" style="width:100vw;height:100vh;border:none;" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+        <iframe src="${game.url}" frameborder="0" style="width:100vw;height:100vh;border:none;" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
       </body>
       </html>
     `.trim();
-    const win=window.open();
-    win.document.open(); win.document.write(html); win.document.close();
+    const win = window.open();
+    if (win) {
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
+    } else {
+      alert("Popup blocked! Please allow popups for this site.");
+    }
   };
-  document.getElementById("downloadBtn").onclick=()=>{
-    const blob=new Blob([`
+
+  // Download the game as HTML
+  document.getElementById("downloadBtn").onclick = () => {
+    const blob = new Blob([`
 <!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><title>${game.name}</title><style>
-html,body{margin:0;height:100%;background:#000;}iframe{border:none;width:100vw;height:100vh;}
-</style></head><body>
-<iframe src="${game.url}" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
-</body></html>
-    `],{type:"text/html"});
-    const a=document.createElement("a");
-    a.href=URL.createObjectURL(blob);
-    a.download=game.name.replace(/\s+/g,"_").toLowerCase()+".html";
-    a.click(); URL.revokeObjectURL(a.href);
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${game.name}</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; }
+    iframe { border: none; width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <iframe src="${game.url}" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+</body>
+</html>
+    `], {type: "text/html"});
+
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = game.name.replace(/\s+/g, "_").toLowerCase() + ".html";
+    document.body.appendChild(a); // for Firefox support
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
   };
 }
-document.getElementById("closeGameModal").onclick=()=>{
-  gameModal.classList.remove("active");
-  setTimeout(()=>{gameModal.style.display="none";gameIframe.src="";},200);
-  if(document.fullscreenElement)document.exitFullscreen();
-};
-document.addEventListener('keydown',e=>{
-  if(e.key==="Escape"&&gameModal.classList.contains("active")){
-    gameModal.classList.remove("active");
-    setTimeout(()=>{gameModal.style.display="none";gameIframe.src="";},200);
-    if(document.fullscreenElement)document.exitFullscreen();
+
+// Close modal function reused by close button & Escape key
+function closeGameModal() {
+  gameModal.classList.remove("show");
+  setTimeout(() => {
+    gameModal.style.display = "none"; // fallback: hide modal container if needed
+    gameIframe.src = "";
+  }, 200);
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  }
+}
+
+// Close button handler
+document.getElementById("closeGameModal").onclick = closeGameModal;
+
+// Close modal on Escape key if modal is open
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && gameModal.classList.contains("show")) {
+    closeGameModal();
   }
 });
 

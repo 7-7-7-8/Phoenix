@@ -142,6 +142,9 @@ body {
   height: 2.2rem;
   overflow: hidden;
   position: relative;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
   user-select: none;
   text-align: center;
 }
@@ -565,7 +568,7 @@ body {
 
   <div class="settings-group">
     <label for="panicKeyInput"><strong>Panic Key:</strong></label>
-    <input type="text" id="panicKeyInput" maxlength="1" style="width:3rem;text-align:center" />
+    <input type="text" id="panicKeyInput" maxlength="1" style="width:3rem;text-align:center placeholder="e.g. P"" />
     <small>Press this key anytime to instantly redirect.</small>
   </div>
 
@@ -1144,16 +1147,27 @@ document.querySelectorAll('.color-dot').forEach(dot=>{
   };
 
   // Save button sets localStorage and closes
-  quickSettingsSaveBtn.onclick = () => {
-    localStorage.setItem('tabCloak', tabCloakSelect.value);
-    alert(`Tab Cloak saved as "${tabCloakSelect.value}"`);
-    quickSettingsModal.style.display = 'none';
-  };
+quickSettingsSaveBtn.onclick = () => {
+  const selected = tabCloakSelect.value;
+  localStorage.setItem('tabCloak', selected);
+  applyCloak(selected);  // <---- Add this line to immediately apply
+  alert(`Tab Cloak saved as "${selected}"`);
+  quickSettingsModal.style.display = 'none';
+};
+
 
   // Reset button resets select to None
-  quickSettingsResetBtn.onclick = () => {
-    tabCloakSelect.value = 'None';
-  };
+ quickSettingsResetBtn.onclick = () => {
+  tabCloakSelect.value = 'None';
+  localStorage.setItem('tabCloak', 'None');
+  applyCloak('None');  // <---- Apply immediately
+};
+function loadSettings() {
+  const savedCloak = localStorage.getItem('tabCloak') || 'None';
+  tabCloakSelect.value = savedCloak;
+  applyCloak(savedCloak);  // <---- apply on load
+}
+
 
 
 

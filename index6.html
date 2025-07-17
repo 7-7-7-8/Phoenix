@@ -131,6 +131,7 @@ body {
   margin-bottom: 12px;
   user-select: none;
   text-align: center;
+  max-width: 100%;
 }
   
 
@@ -140,10 +141,10 @@ body {
   color: var(--outline);
   letter-spacing: 0.06em;
   height: 2.2rem;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
   width: 100%;
-  max-width: 360px;
+  max-width: 100%;
   margin: 0 auto;
   user-select: none;
   text-align: center;
@@ -152,6 +153,10 @@ body {
 .changing-text span {
   position: absolute;
   width: 100%;
+  left: 0;
+  top: 0;
+  text-align: center;
+  white-space: nowrap;
   opacity: 0;
   animation: fadeScroll 12s linear infinite;
 }
@@ -783,22 +788,22 @@ body {
 
     <label for="tabCloakSelect" style="color:#ddd; font-weight:bold;">Tab Cloak:</label><br>
     <select id="tabCloakSelect" style="width:100%; padding:8px; border-radius:6px; border:none; margin-top:6px; font-size: 16px;">
-      <option>None</option>
-      <option>Google Docs</option>
-      <option>Google Forms</option>
-      <option>Google Classroom</option>
-      <option>Google Drive</option>
-      <option>Netflix</option>
-      <option>LinkedIn</option>
-      <option>Zoom</option>
-      <option>Twitter</option>
-      <option>Reddit</option>
-      <option>Facebook</option>
-      <option>GitHub</option>
-      <option>Stack Overflow</option>
-      <option>W3Schools</option>
-      <option>Microsoft Word</option>
-      <option>Microsoft Excel</option>
+     <option value="None">None</option>
+  <option value="Google Docs">Google Docs</option>
+  <option value="Google Forms">Google Forms</option>
+  <option value="Google Classroom">Google Classroom</option>
+  <option value="Google Drive">Google Drive</option>
+  <option value="Netflix">Netflix</option>
+  <option value="LinkedIn">LinkedIn</option>
+  <option value="Zoom">Zoom</option>
+  <option value="Twitter">Twitter</option>
+  <option value="Reddit">Reddit</option>
+  <option value="Facebook">Facebook</option>
+  <option value="GitHub">GitHub</option>
+  <option value="Stack Overflow">Stack Overflow</option>
+  <option value="W3Schools">W3Schools</option>
+  <option value="Microsoft Word">Microsoft Word</option>
+  <option value="Microsoft Excel">Microsoft Excel</option>
       <!-- add others from your original list here -->
     </select>
 

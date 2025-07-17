@@ -1010,14 +1010,16 @@ function openGameModal(game) {
 // Close modal function reused by close button & Escape key
 function closeGameModal() {
   gameModal.classList.remove("show");
+  // Remove iframe src immediately or shortly after removing class
   setTimeout(() => {
-    gameModal.style.display = "none"; // fallback: hide modal container if needed
     gameIframe.src = "";
   }, 200);
+  
   if (document.fullscreenElement) {
     document.exitFullscreen();
   }
 }
+
 
 // Close button handler
 document.getElementById("closeGameModal").onclick = closeGameModal;
